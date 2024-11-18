@@ -1,0 +1,11 @@
+.Base{
+    height: 450px;
+    width: 500px;
+    border-radius: 30px;
+    background-color: rgba(98, 93, 93, 0.97);
+    margin:0 auto;
+}
+.Base h1{
+    font-size:x-large;
+    
+}
