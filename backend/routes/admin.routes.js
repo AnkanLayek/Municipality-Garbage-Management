@@ -1,5 +1,5 @@
 const express = require('express');
-const {adminRegister, adminLogin, adminLogout} = require('../controllers/adminController');
+const {adminRegister, adminLogin, adminLogout} = require('../controllers/admin.controllers');
 const route = express.Router();
 
 route.get("/register", (req, res) => {

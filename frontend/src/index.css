@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.leaflet-grab {
+    cursor: default;
+}
+
+.leaflet-dragging .leaflet-grab {
+    cursor: move;
+}
