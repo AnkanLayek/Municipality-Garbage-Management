@@ -3,8 +3,14 @@
 const mongoose = require('mongoose');
 
 const dustbinModel = mongoose.Schema({
-    dustbinId: String,
-    dustbinNo: String,
+    dustbinId: {
+        type: String,
+        required: true
+    },
+    dustbinNo: {
+        type: Number,
+        required: true
+    },
     areaId: {
         type: String,
         ref: "area"
@@ -12,7 +18,15 @@ const dustbinModel = mongoose.Schema({
     coords: {
         lat: Number,
         lng: Number
-    }
+    },
+    isVisited: {
+        type: Boolean,
+        default: false,
+    },
+    visitedTime: {
+        type: Date,
+        default: null,
+    },
 })
 
 module.exports = mongoose.model('dustbin', dustbinModel);

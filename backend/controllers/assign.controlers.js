@@ -1,16 +1,17 @@
 const { model } = require('mongoose');
 const assignModel = require('../models/assignModel');
+const { select } = require('async');
 
 class assignController {
     async saveAssign(req, res) {
         try {
             const { areaId } = req.params;
-            const { driverUsername, vehicalReg } = req.body;
+            const { driverUsername, vehicleReg } = req.body;
 
             const assigned = await assignModel.create({
                 areaId,
                 driverUsername,
-                vehicalReg
+                vehicleReg
             });
 
             if(assigned){
@@ -48,13 +49,13 @@ class assignController {
     async getAllAssigns(req, res) {
         try {
             const { areaId } = req.params;
-            const { populateArea, populateDustbin, populateDriver, populateVehical } = req.query;
+            const { populateArea, populateDustbin, populateDriver, populateVehicle } = req.query;
 
             if(areaId) {
                 let assignment = await assignModel.findOne({areaId});
                 
                 if(assignment){
-                    if(populateArea == 'true'){
+                    // if(populateArea == 'true'){
                         // In your function to populate areaId
                         if (populateArea === 'true') {
                             assignment = await assignment.populate({
@@ -72,23 +73,24 @@ class assignController {
                             })
                         }
 
-                    }
+                    // }
                     if(populateDriver == 'true'){
-                        assignment = assignment.populate({
-                            path: driverId,
-                            model: driver,
-                            localField: 'driverId',
-                            foreignField: 'driverId'
+                        assignment = await assignment.populate({
+                            path: 'driverUsername',
+                            model: 'driver',
+                            localField: 'username',
+                            foreignField: 'username',
+                        });
+                        // assignment = assignment.select("-password");
+                    }
+                    if(populateVehicle == 'true'){
+                        assignment = await assignment.populate({
+                            path: 'vehicleId',
+                            model: 'vehicle',
+                            localField: 'vehicleId',
+                            foreignField: 'vehicleId'
                         });
                     }
-                    // if(populateVehical == 'true'){
-                    //     assignment = assignment.populate({
-                    //         path: vehicalId,
-                    //         model: vehical,
-                    //         localField: 'vehicalId',
-                    //         foreignField: 'vehicalId'
-                    //     });
-                    // }
                     return res.status(200).json({ message: "Assignment fetched successfully", assignment: assignment });
                 }
                 return res.status(500).json({ message: "Could not fetch assignment details" });
@@ -96,6 +98,46 @@ class assignController {
 
             const assignments = await assignModel.find();
             if(assignments){
+                if (populateArea === 'true') {
+                    for(let eachAssignment of assignments) {
+                        eachAssignment = await eachAssignment.populate({
+                            path: 'areaId',
+                            localField: 'areaId',      // Field in assignModel to match
+                            foreignField: 'areaId',    // Field in areaModel to match
+                        });
+                    }
+                }
+                if(populateDustbin == 'true'){
+                    for(let eachAssignment of assignments) {
+                        eachAssignment = await eachAssignment.populate({
+                            path: 'areaId.dustbins',
+                            localField: 'dustbins',
+                            foreignField: 'dustbinId' 
+                        })
+                    }
+                }
+                if(populateDriver == 'true'){
+                    for(let eachAssignment of assignments) {
+                        eachAssignment = await eachAssignment.populate({
+                            path: 'driverUsername',
+                            model: 'driver',
+                            localField: 'username',
+                            foreignField: 'username',
+                            // select: "-password"
+                        });
+                        // eachAssignment = eachAssignment.select("-password")
+                    }
+                }
+                if(populateVehicle == 'true'){
+                    for(let eachAssignment of assignments) {
+                        eachAssignment = await eachAssignment.populate({
+                            path: 'vehicleReg',
+                            model: 'vehicle',
+                            localField: 'vehicleReg',
+                            foreignField: 'vehicleReg'
+                        });
+                    }
+                }
                 return res.status(200).json({ message: "Assignments fetched successfully", assignments: assignments });
             }
             return res.status(500).json({ message: "Could not fetch assignment details" });

@@ -9,8 +9,9 @@ const assignModel = mongoose.Schema({
         type: String,
         res: "driver"
     },
-    vehicalReg: {
+    vehicleReg: {
         type: String,
+        res: "vehicle"
     }
 })
 

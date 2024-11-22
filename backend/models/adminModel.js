@@ -19,7 +19,11 @@ const adminSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    profilePic : String
+    profilePic : String,
+    isAdmin : {
+        type: Boolean,
+        default: true
+    }
 });
 
 module.exports = mongoose.model("admin", adminSchema);

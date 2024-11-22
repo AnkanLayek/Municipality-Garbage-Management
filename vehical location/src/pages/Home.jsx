@@ -4,28 +4,33 @@ import { Marker, Popup, useMapEvent } from "react-leaflet";
 import L from 'leaflet'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons"
-import carIcon from "../assets/carMarker.png"
-import tempDustbinIcon from "../assets/tempDustbinMarker.png"
+// import tempDustbinIcon from "../assets/tempDustbinMarker.png"
 import dustbinIcon from "../assets/dustbinMarker.png"
+import dustbinIcon1 from '../assets/dustbin1.png'
+import carIcon from "../assets/carMarker.png"
+import { io } from "socket.io-client";
 import { socket } from "../App";
 
-const TrackMap = () => {
-    const getQueryParameter = (name) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const params = urlParams.get(name);
-        return params;
-    }
-
-    const [carPosition, setCarPosition] = useState({lat: undefined, lng: undefined});
+function Home() {
     const [areaId, setAreaId] = useState();
+    const [driver, setDriver] = useState();
+    const [vehical, setVehical] = useState();
     const [dustbins, setDustbins] = useState([]);
-    let [addDustbin, setAddDustbin] = useState({allow: false});
-    let [addDustbinFormData, setAddDustbinFormData] = useState({
-        dustbinId: '',
-        dustbinNo: '',
-        areaId: ''
+    const [assignment, setAssignment] = useState();
+
+    const [isBellowAspect, setIsBellowAspect] = useState();
+    const [mapCenter, setMapCenter] = useState({ lat: 23.526208, lng: 86.923270});
+    const [carPosition, setCarPosition] = useState({lat: undefined, lng: undefined})
+    const [isStarted, setIsStarted] = useState(false);
+    const [watchId, setWatchId] = useState();
+
+    // custom icon for dustbin
+    const dustbinMarker = new L.icon({
+        iconUrl: dustbinIcon,
+        iconSize: [50, 50],
+        iconAnchor: [25, 45],
+        popupAnchor: [0, -45]
     });
-    let [isBellowAspect, setIsBellowAspect] = useState();
 
     // custom icon for car
     const carMarker = new L.icon({
@@ -35,137 +40,49 @@ const TrackMap = () => {
         popupAnchor: [0, -45]
     });
 
-    // custom icon for temporaty dustbin
-    const tempAddDustbinMarker = new L.icon({
-        iconUrl: tempDustbinIcon,
-        iconSize: [30, 30],
-        iconAnchor: [15, 22],
-        popupAnchor: [0, -45]
-    })
-
-    // custom icon for dustbin
-    const dustbinMarker = new L.icon({
-        iconUrl: dustbinIcon,
-        iconSize: [50, 50],
-        iconAnchor: [25, 45],
-        popupAnchor: [0, -45]
-    })
-
-    // fetch all dustbins of the area
-    const getAllDustbins = async (areaId) => {
-        const response = await fetch(
-            `http://localhost:3000/dustbin/getAllDustbins/${areaId}`,
-            {
-                method: 'GET'
-            }
-        );
-        const data = await response.json();
-        if(response.ok){
-            setDustbins(data.dustbins);
-        }
-    };
-
-    const allowAddDustbin = () => {
-        setAddDustbin(prevState => ({
-            ...prevState,
-            allow: true
-        }));
-    }
-
-    // Handle the form inputs
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setAddDustbinFormData(prevData => ({
-            ...prevData,
-            [name]: value
-        }))
-    }
-
-    // create new dustbin
-    const addToDustbins = async (e) => {
-        console.log("addToDustbin called");
-        e.preventDefault();
-        const response = await fetch(
-            "http://localhost:3000/dustbin/createDustbin",
-            {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json'
-                },
-                body: JSON.stringify({
-                    dustbinId: addDustbinFormData.dustbinId,
-                    dustbinNo: addDustbinFormData.dustbinNo,
-                    areaId: addDustbinFormData.areaId,
-                    coords: {
-                        lat: addDustbin.lat,
-                        lng: addDustbin.lng
-                    }
-                })
-            }
-        )
-
-        const data = await response.json();
-        alert(data.message);
-        if(response.ok){
-            setAddDustbin({allow: false});
-            setDustbins(prevDustbins => [ ...prevDustbins, data.addedDustbin ]);
-        }
-        setAddDustbinFormData({
-            dustbinId: '',
-            dustbinNo: '',
-            areaId: ''
+    const startJrny = () => {
+        setIsStarted(true);
+        const id = navigator.geolocation.watchPosition((position)=>{
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            socket.emit("send location", {location: position.coords, areaId: areaId});
+            setMapCenter({lat: lat, lng: lng});
+            setCarPosition({lat: lat, lng: lng})
         });
+
+        setWatchId(id);
+
+        return () => navigator.geolocation.clearWatch(id);
     }
 
-    const deleteDustbin = async (e) => {
-        const dustbinId = e.currentTarget.getAttribute("dustbinid");
-        const areaId = e.currentTarget.getAttribute("areaid");
+    const endJrny = () => {
+        setIsStarted(false);
+        navigator.geolocation.clearWatch(watchId);
+        setCarPosition({lat: undefined, lng: undefined});
+        socket.emit("stop location", {areaId: areaId})
+    }
+
+    const getAssignDetails = async () => {
         const response = await fetch(
-            "http://localhost:3000/dustbin/deleteDustbin",
+            `http://localhost:3000/assign/getAllAssigns/PB101?populateArea=true&populateDustbin=true`,
             {
-                method: 'DELETE',
-                headers: {
-                    "Content-type" : "application/json"
-                },
-                body: JSON.stringify({
-                    dustbinId,
-                    areaId
-                })
+                method: 'GET',
             }
         )
 
         const data = await response.json();
-        alert(data.message);
         if(response.ok){
-            setDustbins(prevDustbins => prevDustbins.filter(dustbin => dustbin.dustbinId != dustbinId));
+            setAssignment(data.assignment);
+            setAreaId(data.assignment.areaId);
+            setDriver(data.assignment.driverUsername);
+            setVehical(data.assignment.vehicalReg);
+            setDustbins(data.assignment.areaId.dustbins);
         }
     }
-
-    // Event listeners on map
-    const EventListenerComponent = () => {
-        if(addDustbin.allow){
-            useMapEvent("click", (e) => {
-                console.log("Clicked on ", e.latlng);
-                setAddDustbin({
-                    lat: e.latlng.lat,
-                    lng: e.latlng.lng,
-                    allow: true
-                })
-            })
-        }
-
-        return null
-    }
-
-    useEffect(()=>{
-        const areaId = getQueryParameter('areaId')
-        getAllDustbins(areaId);
-        setAreaId(areaId)
-    }, []);
 
     useEffect(() => {
         const checkAspectRatio = () => {
-            setIsBellowAspect( window.innerHeight < window.innerWidth );
+            setIsBellowAspect( window.innerHeight / window.innerWidth < 1 )
         }
 
         checkAspectRatio();
@@ -174,56 +91,29 @@ const TrackMap = () => {
         return () => window.removeEventListener('resize', checkAspectRatio);
     }, []);
 
-
-    socket.on("receive location", (data) => {
-        // console.log(data.location);
-        // console.log(areaId)
-        if(data.areaId.areaId == areaId){
-            setCarPosition({
-                lat: data.location.latitude,
-                lng: data.location.longitude
-            })
-        }
-    })
-
-    socket.on("driver disconnected", (data) => {
-        console.log(data.areaId)
-        if(data.areaId == areaId){
-            setCarPosition({
-                lat: undefined,
-                lng: undefined
-            })
-        }
-    })
-
-    
+    useEffect(() => {
+        getAssignDetails();
+    },[]);
 
     return (
         <>
             { (isBellowAspect != undefined) ?
                 <div className={`flex ${ isBellowAspect ? 'flex-row' : 'flex-col' }`}>
-                    <div className={`map ${ isBellowAspect ? ('w-[58vw] h-screen') : ('h-[58vh] w-full')}`}>
-                        <MapComponent>
+                    <div className={`map ${ isBellowAspect ? 'w-[58vw] h-screen' : 'h-[58vh] w-full'}`}>
+                        <MapComponent center={mapCenter}>
                             {/* Marker for all dustbins */}
                             {dustbins.map((eachDustbin, idx) => (
                                 <Marker key={idx} position={[eachDustbin.coords.lat, eachDustbin.coords.lng]} icon={dustbinMarker}>
                                     <Popup>
-                                        <div className="flex gap-2 justify-end mb-1">
+                                        {/* <div className="flex gap-2 justify-end mb-1">
                                             <button><FontAwesomeIcon icon={faPencil} /></button>
                                             <button dustbinid={eachDustbin.dustbinId} areaid="PB101" onClick={deleteDustbin}><FontAwesomeIcon icon={faTrash} /></button>
-                                        </div>
+                                        </div> */}
                                         <pre>ID  : {eachDustbin.dustbinId}</pre>
                                         <pre>No. : {eachDustbin.dustbinNo}</pre>
                                     </Popup>
                                 </Marker>
                             ))}
-
-                            {/* Temporary Marker for new dustbin */}
-                            {addDustbin.lat && addDustbin.lng && (
-                                <Marker icon={tempAddDustbinMarker} position={[addDustbin.lat, addDustbin.lng]}>
-                                    <Popup>Add Dustbin Here ?</Popup>
-                                </Marker>
-                            )}
 
                             {/* Marker for car */}
                             {carPosition.lat != undefined ?
@@ -235,12 +125,20 @@ const TrackMap = () => {
                                 : <></>
                             }
                             
-                            <EventListenerComponent/>
+
+                            {/* Temporary Marker for new dustbin */}
+                            {/* {addDustbin.lat && addDustbin.lng && (
+                                <Marker icon={tempAddDustbinMarker} position={[addDustbin.lat, addDustbin.lng]}>
+                                    <Popup>Add Dustbin Here ?</Popup>
+                                </Marker>
+                            )} */}
+                            
+                            {/* <EventListenerComponent/> */}
                         </MapComponent>
                     </div>
                     
                     <div className={`controls p-10 z-[400] ${ isBellowAspect ? 'w-[42vw] h-screen' : 'h-[43vh] w-full'}`} style={{ boxShadow: "-10px 0px 20px -5px rgba(0, 0, 0, 0.3)" }}>
-                        <div className="inline-block">
+                        {/* <div className="inline-block">
                             { addDustbin.allow
                                 ? addDustbin.lat
                                     ? <div>
@@ -271,7 +169,16 @@ const TrackMap = () => {
                                     </div>
                                 : <div className="px-5 py-3 border-black border-2 rounded-full cursor-pointer" onClick={allowAddDustbin}>Add Dustbin</div>
                             }
-                        </div>
+                        </div> */}
+                        {isStarted
+                            ?<div className="w-52 text-center text-white text-xl px-5 py-3 bg-red-600 rounded-full cursor-pointer" onClick={endJrny}>
+                                End Journey
+                            </div>
+                            : <div className="w-52 text-center text-white text-xl px-5 py-3 bg-sky-600 rounded-full cursor-pointer" onClick={startJrny}>
+                                Start Journey
+                            </div>
+                        }
+                        
                     </div>
                 </div>
 
@@ -281,4 +188,4 @@ const TrackMap = () => {
     )
 }
 
-export default TrackMap
+export default Home
