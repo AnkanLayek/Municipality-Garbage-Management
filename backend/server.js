@@ -7,6 +7,7 @@ const path = require('path');
 
 const adminRouter = require('./routes/admin.routes');
 const areaRouter = require('./routes/area.routes');
+const pathRouter = require('./routes/path.routes');
 const dustbinRouter = require('./routes/dustbin.routes');
 const driverRouter = require('./routes/driver.routes');
 const assignRouter = require('./routes/assign.routes');
@@ -15,6 +16,7 @@ const cookieParser = require('cookie-parser');
 const db = require('./configs/mongooseConnection');
 
 const app = express();
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -66,6 +68,7 @@ app.set("view engine", "ejs");
 
 app.use("/admin", adminRouter);
 app.use("/area", areaRouter);
+app.use("/path", pathRouter);
 app.use("/dustbin", dustbinRouter);
 app.use("/driver", driverRouter);
 app.use("/assign", assignRouter);

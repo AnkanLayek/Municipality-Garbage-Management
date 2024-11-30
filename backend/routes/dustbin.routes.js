@@ -3,7 +3,7 @@ const { createDustbin, getAllDustbins, deleteDustbin } = require('../controllers
 const route = express.Router();
 
 route.post("/createDustbin", createDustbin);
-route.get("/getAllDustbins/:areaId", getAllDustbins);
+route.get("/getAllDustbins/:pathId", getAllDustbins);
 route.delete("/deleteDustbin", deleteDustbin);
 
 module.exports = route;

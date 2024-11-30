@@ -17,13 +17,13 @@ const TrackMap = () => {
     }
 
     const [carPosition, setCarPosition] = useState({lat: undefined, lng: undefined});
-    const [areaId, setAreaId] = useState();
+    const [pathId, setPathId] = useState();
     const [dustbins, setDustbins] = useState([]);
     let [addDustbin, setAddDustbin] = useState({allow: false});
     let [addDustbinFormData, setAddDustbinFormData] = useState({
         dustbinId: '',
         dustbinNo: '',
-        areaId: ''
+        pathId: ''
     });
     let [isBellowAspect, setIsBellowAspect] = useState();
 
@@ -51,10 +51,10 @@ const TrackMap = () => {
         popupAnchor: [0, -45]
     })
 
-    // fetch all dustbins of the area
-    const getAllDustbins = async (areaId) => {
+    // fetch all dustbins of the path
+    const getAllDustbins = async (pathId) => {
         const response = await fetch(
-            `http://localhost:3000/dustbin/getAllDustbins/${areaId}`,
+            `http://localhost:3000/dustbin/getAllDustbins/${pathId}`,
             {
                 method: 'GET'
             }
@@ -83,7 +83,6 @@ const TrackMap = () => {
 
     // create new dustbin
     const addToDustbins = async (e) => {
-        console.log("addToDustbin called");
         e.preventDefault();
         const response = await fetch(
             "http://localhost:3000/dustbin/createDustbin",
@@ -95,7 +94,7 @@ const TrackMap = () => {
                 body: JSON.stringify({
                     dustbinId: addDustbinFormData.dustbinId,
                     dustbinNo: addDustbinFormData.dustbinNo,
-                    areaId: addDustbinFormData.areaId,
+                    pathId: addDustbinFormData.pathId,
                     coords: {
                         lat: addDustbin.lat,
                         lng: addDustbin.lng
@@ -113,13 +112,13 @@ const TrackMap = () => {
         setAddDustbinFormData({
             dustbinId: '',
             dustbinNo: '',
-            areaId: ''
+            pathId: ''
         });
     }
 
     const deleteDustbin = async (e) => {
         const dustbinId = e.currentTarget.getAttribute("dustbinid");
-        const areaId = e.currentTarget.getAttribute("areaid");
+        const pathId = e.currentTarget.getAttribute("pathid");
         const response = await fetch(
             "http://localhost:3000/dustbin/deleteDustbin",
             {
@@ -129,7 +128,7 @@ const TrackMap = () => {
                 },
                 body: JSON.stringify({
                     dustbinId,
-                    areaId
+                    pathId
                 })
             }
         )
@@ -158,9 +157,9 @@ const TrackMap = () => {
     }
 
     useEffect(()=>{
-        const areaId = getQueryParameter('areaId')
-        getAllDustbins(areaId);
-        setAreaId(areaId)
+        const pathId = getQueryParameter('pathId')
+        getAllDustbins(pathId);
+        setPathId(pathId)
     }, []);
 
     useEffect(() => {
@@ -177,8 +176,8 @@ const TrackMap = () => {
 
     socket.on("receive location", (data) => {
         // console.log(data.location);
-        // console.log(areaId)
-        if(data.areaId.areaId == areaId){
+        // console.log(pathId)
+        if(data.pathId.pathId == pathId){
             setCarPosition({
                 lat: data.location.latitude,
                 lng: data.location.longitude
@@ -187,8 +186,8 @@ const TrackMap = () => {
     })
 
     socket.on("driver disconnected", (data) => {
-        console.log(data.areaId)
-        if(data.areaId == areaId){
+        console.log(data.pathId)
+        if(data.pathId == pathId){
             setCarPosition({
                 lat: undefined,
                 lng: undefined
@@ -210,7 +209,7 @@ const TrackMap = () => {
                                     <Popup>
                                         <div className="flex gap-2 justify-end mb-1">
                                             <button><FontAwesomeIcon icon={faPencil} /></button>
-                                            <button dustbinid={eachDustbin.dustbinId} areaid="PB101" onClick={deleteDustbin}><FontAwesomeIcon icon={faTrash} /></button>
+                                            <button dustbinid={eachDustbin.dustbinId} pathid="PATH001" onClick={deleteDustbin}><FontAwesomeIcon icon={faTrash} /></button>
                                         </div>
                                         <pre>ID  : {eachDustbin.dustbinId}</pre>
                                         <pre>No. : {eachDustbin.dustbinNo}</pre>
@@ -256,7 +255,7 @@ const TrackMap = () => {
                                                 onChange={handleInputChange} />
                                             <input
                                                 className="border-black border-2 rounded-md mr-1 mb-1 px-2"
-                                                type="text" placeholder="Area ID" name="areaId" value={addDustbinFormData.areaId}
+                                                type="text" placeholder="Path ID" name="pathId" value={addDustbinFormData.pathId}
                                                 onChange={handleInputChange} />
                                             <div className="flex gap-2 mt-10">
                                                 <button type="submit" className="w-32 text-center text-white text-lg px-5 py-2 bg-green-700 rounded-full cursor-pointer">Add</button>

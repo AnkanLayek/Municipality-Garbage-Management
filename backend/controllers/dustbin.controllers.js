@@ -1,13 +1,13 @@
 // dustbin.controllers.js
 
-const areaModel = require("../models/areaModel");
+const pathModel = require("../models/pathModel");
 const dustbinModel = require("../models/dustbinModel");
 
 class dustbinController {
     async createDustbin(req, res) {
         try{
 
-            const { dustbinId, dustbinNo, areaId, coords } = req.body;
+            const { dustbinId, dustbinNo, pathId, coords } = req.body;
     
             // Check if dustbin id already exists
             const dustbinIdCheck = await dustbinModel.findOne({dustbinId});
@@ -19,15 +19,15 @@ class dustbinController {
             const addedDustbin = await dustbinModel.create({
                 dustbinId,
                 dustbinNo,
-                areaId,
+                pathId,
                 coords
             });
     
             if(addedDustbin){
-                const area = await areaModel.findOne({ areaId });
-                area.dustbins.push(addedDustbin.dustbinId);
-                area.noOfDustbins++;
-                await area.save();
+                const path = await pathModel.findOne({ pathId });
+                path.dustbins.push(addedDustbin.dustbinId);
+                path.noOfDustbins++;
+                await path.save();
                 return res.status(201).json({message: "Dustbin added successfully", addedDustbin: addedDustbin});  // 201 Created
             }
 
@@ -43,10 +43,10 @@ class dustbinController {
     async getAllDustbins(req, res) {
         try{
 
-            const { areaId } = req.params;
+            const { pathId } = req.params;
 
-            // Fetch all dustbins of the provided area
-            const dustbins = await dustbinModel.find({ areaId });
+            // Fetch all dustbins of the provided path
+            const dustbins = await dustbinModel.find({ pathId });
             if(dustbins.length == 0){
                 return res.status(404).json({message: "No dustbin found", dustbins: []});  // 404 Not found
             }
@@ -61,14 +61,15 @@ class dustbinController {
     async deleteDustbin(req, res) {
         try{
 
-            const { dustbinId, areaId } = req.body;
+            const { dustbinId, pathId } = req.body;
 
             // Delete dustbin by dustbinId
             const deletedDustbin = await dustbinModel.deleteOne({ dustbinId });
             if(deletedDustbin.deletedCount > 0){
-                let area = await areaModel.findOne({ areaId });
-                area.dustbins = area.dustbins.filter(element => element != dustbinId);
-                await area.save();
+                let path = await pathModel.findOne({ pathId });
+                path.dustbins = path.dustbins.filter(element => element != dustbinId);
+                path.noOfDustbins--;
+                await path.save();
                 return res.status(200).json({message: "Dustbin deleted successfully"});  // 200 OK
             }
             return res.status(404).json({message: "No such dustbin found to delete"});  // 404 Not found

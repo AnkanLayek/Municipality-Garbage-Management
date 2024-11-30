@@ -8,6 +8,7 @@ import SlideShow from './pages/SlideShow'
 import Assignment from './pages/Assignment'
 import LoginPage from './pages/Login'
 import Dashboard1 from './pages/Dashboard1'
+import AddPath from './pages/AddPath'
 
 const isAdmin = 'true'
 
@@ -26,6 +27,7 @@ function App() {
           <Route path='/dashboard1' element={< Dashboard1 />} />
           <Route path='/track' element={< TrackMap />} />
           <Route path='/assign' element={<Assignment />} />
+          <Route path='/addPath' element={<AddPath />} />
 
           <Route path='/slideShow' element={< SlideShow />} />
         </Routes>

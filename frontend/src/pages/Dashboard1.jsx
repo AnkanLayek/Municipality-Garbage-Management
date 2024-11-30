@@ -53,7 +53,7 @@ const Dashboard1 = () => {
                                 areaId={eachProfile.areaId.areaId}
                                 dustbinNo={eachProfile.areaId.noOfDustbins}
                                 driverName={eachProfile.driverUsername.fullName}
-                                vehicleNo={eachProfile.vehicleReg}
+                                vehicleNo={eachProfile.vehicleReg.vehicleReg}
                             />
                             
                         </div>

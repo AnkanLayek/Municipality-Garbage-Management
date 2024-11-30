@@ -2,10 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+*{
+    box-sizing: border-box;
+}
+
 .leaflet-grab {
     cursor: default;
 }
 
 .leaflet-dragging .leaflet-grab {
     cursor: move;
+}
+
+.navMenuOps:hover {
+    border: none;
+    background: linear-gradient(to bottom, #388E3C, #4fc454);
+    color: white;
+}
+
+.navMenuOps:active {
+    border: none;
+    background: linear-gradient(to top, #388E3C, #4fc454);
+    color: white;
+}
+
+.leaflet-routing-container {
+    display: none;
+}
+
+.sidePathListContainer::-webkit-scrollbar {
+    display: none;
 }

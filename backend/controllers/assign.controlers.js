@@ -5,15 +5,27 @@ const { select } = require('async');
 class assignController {
     async saveAssign(req, res) {
         try {
-            const { areaId } = req.params;
+            const { pathId } = req.params;
             const { driverUsername, vehicleReg } = req.body;
 
-            const assigned = await assignModel.create({
-                areaId,
-                driverUsername,
-                vehicleReg
-            });
+            const existingAssign = await assignModel.findOne({pathId});
 
+            let assigned;
+
+            if(existingAssign) {
+                assigned = await assignModel.findOneAndUpdate({pathId : pathId}, {
+                    driverUsername,
+                    vehicleReg
+                }, {new: true})
+            }
+            else{
+                assigned = await assignModel.create({
+                    pathId,
+                    driverUsername,
+                    vehicleReg
+                });
+            }
+            
             if(assigned){
                 return res.status(201).json({ message: "Assigned successfully", assigned: assigned });
             }
@@ -31,9 +43,9 @@ class assignController {
     async deleteAssign(req, res) {
         try{
 
-            const { areaId } = req.params;
+            const { pathId } = req.params;
     
-            const deleted = await assignModel.deleteOne({areaId});
+            const deleted = await assignModel.deleteOne({pathId});
             if(deleted.deletedCount) {
                 return res.status(201).json({ message: "Assignment deleted successfully" });
             }
@@ -48,26 +60,26 @@ class assignController {
 
     async getAllAssigns(req, res) {
         try {
-            const { areaId } = req.params;
-            const { populateArea, populateDustbin, populateDriver, populateVehicle } = req.query;
+            const { pathId } = req.params;
+            const { populatePath, populateDustbin, populateDriver, populateVehicle } = req.query;
 
-            if(areaId) {
-                let assignment = await assignModel.findOne({areaId});
+            if(pathId) {
+                let assignment = await assignModel.findOne({pathId});
                 
                 if(assignment){
-                    // if(populateArea == 'true'){
-                        // In your function to populate areaId
-                        if (populateArea === 'true') {
+                    // if(populatePath == 'true'){
+                        // In your function to populate pathId
+                        if (populatePath === 'true') {
                             assignment = await assignment.populate({
-                                path: 'areaId',
-                                localField: 'areaId',      // Field in assignModel to match
-                                foreignField: 'areaId',    // Field in areaModel to match
+                                path: 'pathId',
+                                localField: 'pathId',      // Field in assignModel to match
+                                foreignField: 'pathId',    // Field in pathModel to match
                             });
                         }
 
                         if(populateDustbin == 'true'){
                             assignment = await assignment.populate({
-                                path: 'areaId.dustbins',
+                                path: 'pathId.dustbins',
                                 localField: 'dustbins',
                                 foreignField: 'dustbinId' 
                             })
@@ -98,19 +110,19 @@ class assignController {
 
             const assignments = await assignModel.find();
             if(assignments){
-                if (populateArea === 'true') {
+                if (populatePath === 'true') {
                     for(let eachAssignment of assignments) {
                         eachAssignment = await eachAssignment.populate({
-                            path: 'areaId',
-                            localField: 'areaId',      // Field in assignModel to match
-                            foreignField: 'areaId',    // Field in areaModel to match
+                            path: 'pathId',
+                            localField: 'pathId',      // Field in assignModel to match
+                            foreignField: 'pathId',    // Field in pathModel to match
                         });
                     }
                 }
                 if(populateDustbin == 'true'){
                     for(let eachAssignment of assignments) {
                         eachAssignment = await eachAssignment.populate({
-                            path: 'areaId.dustbins',
+                            path: 'pathId.dustbins',
                             localField: 'dustbins',
                             foreignField: 'dustbinId' 
                         })

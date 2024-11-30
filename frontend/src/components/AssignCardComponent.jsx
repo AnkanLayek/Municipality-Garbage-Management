@@ -1,16 +1,16 @@
 import { useState } from "react"
 import {useNavigate} from 'react-router-dom'
 
-const AssignCardComponent = ({areaName, areaId, dustbinNo, driverName, vehicleNo, children}) => {
-    // const [areaName, serAreaName] = useState();
-    // const [areaId, setAreaId] = useState();
+const AssignCardComponent = ({pathName, pathId, dustbinNo, driverName, vehicleNo, children}) => {
+    // const [pathName, serPathName] = useState();
+    // const [pathId, setPathId] = useState();
     // const [dustbinNo, setDustbinNo] = useState();
     // const [driverName, setDriverName] = useState();
     // const [vehicleNo, setVehicalNo] = useState();
     const navigate = useNavigate();
 
     const navigateToTrackMap = () => {
-        const url = `/track?areaId=${areaId}`;
+        const url = `/track?pathId=${pathId}`;
         navigate(url);
     }
     
@@ -21,10 +21,10 @@ const AssignCardComponent = ({areaName, areaId, dustbinNo, driverName, vehicleNo
                 <div className="bg-gray-500 h-44 w-44 rounded-full"></div>
                 <div>
                     <div className="text-2xl font-bold text-green-700 mb-2">
-                        <b>Area Name :</b> {areaName}
+                        <b>Path Name :</b> {pathName}
                     </div>
                     <div className="text-lg mb-2">
-                        <b>Area ID :</b> {areaId}
+                        <b>Path ID :</b> {pathId}
                     </div>
                     <div className="text-lg mb-2">
                         <b>No. of Dustbin :</b> {dustbinNo}

@@ -61,6 +61,7 @@ const SlideShow = () => {
     return (
       <div className="slide-container">
         <h2 className='text-3xl font-semibold mb-4'>Assignments</h2>
+        <div>
         <Slide>
           {profiles.map((eachProfile, idx) => (
             <div key={idx}>
@@ -70,7 +71,7 @@ const SlideShow = () => {
               areaId={eachProfile.areaId.areaId}
               dustbinNo={eachProfile.areaId.noOfDustbins}
               driverName={eachProfile.driverUsername.fullName}
-              vehicleNo={eachProfile.vehicleReg}
+              vehicleNo={eachProfile.vehicleReg.vehicleReg}
               className='driverSlides visible'
             >
               {/* <button className='text-6xl text-gray-500 rounded-l-md absolute top-1/2 right-0 -translate-y-1/2 px-3 py-3'
@@ -84,6 +85,7 @@ const SlideShow = () => {
             </div>
           ))} 
         </Slide>
+        </div>
       </div>
     )
 }

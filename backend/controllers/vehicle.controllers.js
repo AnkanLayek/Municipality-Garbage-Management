@@ -1,6 +1,6 @@
 // dustbin.controllers.js
 
-// const areaModel = require("../models/areaModel");
+// const pathModel = require("../models/pathModel");
 const vehicleModel = require("../models/vehicleModel");
 
 class vehicleController {

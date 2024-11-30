@@ -11,9 +11,9 @@ const dustbinModel = mongoose.Schema({
         type: Number,
         required: true
     },
-    areaId: {
+    pathId: {
         type: String,
-        ref: "area"
+        ref: "path"
     },
     coords: {
         lat: Number,

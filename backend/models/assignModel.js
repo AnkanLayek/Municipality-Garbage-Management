@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
 
 const assignModel = mongoose.Schema({
-    areaId: {
+    pathId: {
         type: String,
-        ref: "area"
+        ref: "path"
     },
     driverUsername: {
         type: String,
-        res: "driver"
+        ref: "driver"
     },
     vehicleReg: {
         type: String,
-        res: "vehicle"
+        ref: "vehicle"
     }
 })
 

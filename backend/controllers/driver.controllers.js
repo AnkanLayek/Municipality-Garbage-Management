@@ -81,7 +81,7 @@ class driverController {
         try{
             const { username } = req.params;
 
-            // Fetch specific area if areaId is provided
+            // Fetch specific path if pathId is provided
             if(username){
                 const user = await driverModel.findOne({username}).select("-password");
                 if(!user){
@@ -90,7 +90,7 @@ class driverController {
                 return res.status(200).json({message: "Driver details fetched successfully", driver: driver});  // 200 OK
             }
 
-            // Fetch all areas if no areaId is provided
+            // Fetch all paths if no pathId is provided
             else{
                 const drivers = await driverModel.find().select("-password");
                 if(drivers.length == 0){
