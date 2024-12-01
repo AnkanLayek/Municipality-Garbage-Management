@@ -12,7 +12,7 @@ import { io } from "socket.io-client";
 import { socket } from "../App";
 
 function Home() {
-    const [areaId, setAreaId] = useState();
+    const [pathId, setPathId] = useState();
     const [driver, setDriver] = useState();
     const [vehical, setVehical] = useState();
     const [dustbins, setDustbins] = useState([]);
@@ -45,7 +45,7 @@ function Home() {
         const id = navigator.geolocation.watchPosition((position)=>{
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            socket.emit("send location", {location: position.coords, areaId: areaId});
+            socket.emit("send location", {location: position.coords, pathId: pathId});
             setMapCenter({lat: lat, lng: lng});
             setCarPosition({lat: lat, lng: lng})
         });
@@ -59,12 +59,12 @@ function Home() {
         setIsStarted(false);
         navigator.geolocation.clearWatch(watchId);
         setCarPosition({lat: undefined, lng: undefined});
-        socket.emit("stop location", {areaId: areaId})
+        socket.emit("stop location", {pathId: pathId})
     }
 
     const getAssignDetails = async () => {
         const response = await fetch(
-            `http://localhost:3000/assign/getAllAssigns/PB101?populateArea=true&populateDustbin=true`,
+            `http://localhost:3000/assign/getAllAssigns/PATH001?populatePath=true&populateDustbin=true`,
             {
                 method: 'GET',
             }
@@ -73,10 +73,10 @@ function Home() {
         const data = await response.json();
         if(response.ok){
             setAssignment(data.assignment);
-            setAreaId(data.assignment.areaId);
+            setPathId(data.assignment.pathId);
             setDriver(data.assignment.driverUsername);
             setVehical(data.assignment.vehicalReg);
-            setDustbins(data.assignment.areaId.dustbins);
+            setDustbins(data.assignment.pathId.dustbins);
         }
     }
 
@@ -107,7 +107,7 @@ function Home() {
                                     <Popup>
                                         {/* <div className="flex gap-2 justify-end mb-1">
                                             <button><FontAwesomeIcon icon={faPencil} /></button>
-                                            <button dustbinid={eachDustbin.dustbinId} areaid="PB101" onClick={deleteDustbin}><FontAwesomeIcon icon={faTrash} /></button>
+                                            <button dustbinid={eachDustbin.dustbinId} pathid="PB101" onClick={deleteDustbin}><FontAwesomeIcon icon={faTrash} /></button>
                                         </div> */}
                                         <pre>ID  : {eachDustbin.dustbinId}</pre>
                                         <pre>No. : {eachDustbin.dustbinNo}</pre>
@@ -154,7 +154,7 @@ function Home() {
                                                 onChange={handleInputChange} />
                                             <input
                                                 className="border-black border-2 rounded-md mr-1 mb-1 px-2"
-                                                type="text" placeholder="Area ID" name="areaId" value={addDustbinFormData.areaId}
+                                                type="text" placeholder="path ID" name="pathId" value={addDustbinFormData.pathId}
                                                 onChange={handleInputChange} />
                                             <div className="flex gap-2 mt-10">
                                                 <button type="submit" className="w-32 text-center text-white text-lg px-5 py-2 bg-green-700 rounded-full cursor-pointer">Add</button>

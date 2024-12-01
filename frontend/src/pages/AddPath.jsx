@@ -14,6 +14,7 @@ import RoutingComponent from "../components/RoutingComponent";
 import NavBarComponent from "../components/NavBarComponent";
 import AllPathsComponent from "../components/AllPathsComponent";
 import { useLocation, useNavigate } from "react-router-dom";
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
 const AddPath = () => {
     const [formPathId, setFromPathId] = useState('');
@@ -41,7 +42,7 @@ const AddPath = () => {
 
     const createPath = async (e) => {
         e.preventDefault()
-        const response = await fetch("http://localhost:3000/path/createPath",{
+        const response = await fetch(`${backendURL}/path/createPath`,{
             method: 'POST',
             headers: {
                 'Content-type' : "application/json"
@@ -93,7 +94,7 @@ const AddPath = () => {
     // fetch all checkpoints of the path
     const getAllCheckpoints = async (pathId) => {
         const response = await fetch(
-            `http://localhost:3000/path/getAllPaths/${pathId}`,
+            `${backendURL}/path/getAllPaths/${pathId}`,
             {
                 method: 'GET'
             }
@@ -127,7 +128,7 @@ const AddPath = () => {
         console.log(addCheckPoint)
         e.preventDefault();
         const response = await fetch(
-            "http://localhost:3000/path/addCheckPoint",
+            `${backendURL}/path/addCheckPoint`,
             {
                 method: 'POST',
                 headers: {
@@ -156,7 +157,7 @@ const AddPath = () => {
         const CPId = e.currentTarget.getAttribute("cpid");
         const pathId = e.currentTarget.getAttribute("pathid");
         const response = await fetch(
-            "http://localhost:3000/path/deleteCheckPoint",
+            `${backendURL}/path/deleteCheckPoint`,
             {
                 method: 'DELETE',
                 headers: {
@@ -243,6 +244,7 @@ const AddPath = () => {
                 { (isBellowAspect != undefined) ?
                     <>
                         {(isBellowAspect || isExpanded)
+                            // side bar of path list container
                             ? <div className={`sidePathListContainer w-96 h-full bg-white ${!isBellowAspect ? 'absolute' : ''} z-[5] overflow-y-auto`}>
                                 {!isBellowAspect
                                     ? <div className="m-4 flex flex-row-reverse">
@@ -254,8 +256,10 @@ const AddPath = () => {
                                     : <></>
                                 }
 
+                                {/* side bar of path list */}
                                 <div className={`sidePathList  ${isBellowAspect ? 'h-[calc(100vh-4rem)]' : 'h-[calc(100vh-4rem-3.25rem)]'}`}>  {/* to handle the height*/}
                                     <div className="py-5">
+                                        {/* create new path div */}
                                         <div className="w-full px-5 mb-3 flex flex-col">
                                             <div
                                                 className={`w-full h-40 ${(pathId == null) ? 'border-4' : 'border-2'} border-green-700 rounded-lg flex flex-col gap-2 justify-center items-center relative`}
@@ -271,18 +275,23 @@ const AddPath = () => {
                                                 <div>Dustbins No. : {eachPath.dustbins.length}</div> */}
                                             </div>
                                         </div>
+
+                                        {/* fetching all the paths */}
                                         <AllPathsComponent currentPathId={pathId} onPathClick={handleNavigation} refreshPaths={refreshPaths} />
                                     </div>
                                 </div>
                             </div>
 
+                            // expand path list button for mobiles only
                             : <div className="absolute top-0 left-0 w-10 h-10 bg-white flex justify-center items-center z-[3]"
                                 onClick={expandPathlist}>
                                 <FontAwesomeIcon icon={faAngleDown} />
                             </div>
                         }
 
+                        {/* main page portion */}
                         <div className={`w-full flex ${ isBellowAspect ? 'flex-row' : 'flex-col' } relative`}>
+                            {/* form for creating new path */}
                             <div
                                 className={`absolute z-[3] rounded-lg flex flex-col items-center p-5 left-1/2 -translate-x-1/2 transition-all duration-150
                                             ${addNewPath ? 'top-1/2 -translate-y-1/2' : 'top-0 -translate-y-full'}`}
@@ -315,6 +324,7 @@ const AddPath = () => {
                                 </form>
                             </div>
 
+                            {/* map portion */}
                             <div className={`map z-0 ${ isBellowAspect ? ('w-[58%] h-[calc(100vh-4rem)]') : ('h-[58vh] w-full')}`}>
                                 <MapComponent>
                                     {/* Marker for all dustbins */}
@@ -354,6 +364,7 @@ const AddPath = () => {
                                 </MapComponent>
                             </div>
                             
+                            {/* control portion */}
                             <div className={`controls p-10 z-[1] ${ isBellowAspect ? 'w-[42%] h-[calc(100vh-4rem)]' : 'h-[43vh] w-full'}`} style={{ boxShadow: "-10px 0px 20px -5px rgba(0, 0, 0, 0.3)" }}>
                                 <div className="inline-block">
                                     { addCheckPoint.allow

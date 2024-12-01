@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import MapComponent from "./MapComponent";
 import RoutingComponent from "./RoutingComponent";
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
 const AllPathsComponent = ({ currentPathId, onPathClick, refreshPaths }) => {
     const [paths, setPaths] = useState([])
 
     const getAllPaths = async () => {
-        const response = await fetch("http://localhost:3000/path/getAllPaths", {
+        const response = await fetch(`${backendURL}/path/getAllPaths`, {
             method: 'GET'
         });
         const data = await response.json();

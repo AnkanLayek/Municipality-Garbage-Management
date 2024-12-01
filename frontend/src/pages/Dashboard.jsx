@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons"
+
 import AssignCardComponent from '../components/AssignCardComponent';
 import NavBarComponent from '../components/NavBarComponent';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
 import '../styles/Dashboard.css'
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons"
 
 // const divStyle = {
 //   display: 'flex',
@@ -53,7 +55,7 @@ const Dashboard = () => {
 
   const fetchProfiles = async () => {
     try {
-      const response = await fetch('http://localhost:3000/assign/getAllAssigns?populatePath=true&populateDustbin=true&populateDriver=true&populateVehicle=true', {
+      const response = await fetch(`${backendURL}/assign/getAllAssigns?populatePath=true&populateDustbin=true&populateDriver=true&populateVehicle=true`, {
         method: 'GET',
         // headers: headers
       });

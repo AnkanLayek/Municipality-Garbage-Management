@@ -3,6 +3,7 @@ import NavBarComponent from "../components/NavBarComponent";
 import AssignCardComponent from "../components/AssignCardComponent";
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
 const Dashboard1 = () => {
     const [profiles, setProfiles] = useState([]);
@@ -15,7 +16,7 @@ const Dashboard1 = () => {
 
     const fetchProfiles = async () => {
         try{
-            const response = await fetch("http://localhost:3000/assign/getAllAssigns?populateArea=true&populateDustbin=true&populateDriver=true&populateVehicle=true", {
+            const response = await fetch(`${backendURL}/assign/getAllAssigns?populateArea=true&populateDustbin=true&populateDriver=true&populateVehicle=true`, {
                 method: 'GET',
             });
             const data = await response.json();

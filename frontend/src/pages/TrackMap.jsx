@@ -8,6 +8,7 @@ import carIcon from "../assets/carMarker.png"
 import tempDustbinIcon from "../assets/tempDustbinMarker.png"
 import dustbinIcon from "../assets/dustbinMarker.png"
 import { socket } from "../App";
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
 const TrackMap = () => {
     const getQueryParameter = (name) => {
@@ -54,7 +55,7 @@ const TrackMap = () => {
     // fetch all dustbins of the path
     const getAllDustbins = async (pathId) => {
         const response = await fetch(
-            `http://localhost:3000/dustbin/getAllDustbins/${pathId}`,
+            `${backendURL}/dustbin/getAllDustbins/${pathId}`,
             {
                 method: 'GET'
             }
@@ -85,7 +86,7 @@ const TrackMap = () => {
     const addToDustbins = async (e) => {
         e.preventDefault();
         const response = await fetch(
-            "http://localhost:3000/dustbin/createDustbin",
+            `${backendURL}/dustbin/createDustbin`,
             {
                 method: 'POST',
                 headers: {
@@ -120,7 +121,7 @@ const TrackMap = () => {
         const dustbinId = e.currentTarget.getAttribute("dustbinid");
         const pathId = e.currentTarget.getAttribute("pathid");
         const response = await fetch(
-            "http://localhost:3000/dustbin/deleteDustbin",
+            `${backendURL}/dustbin/deleteDustbin`,
             {
                 method: 'DELETE',
                 headers: {

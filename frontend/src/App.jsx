@@ -9,10 +9,11 @@ import Assignment from './pages/Assignment'
 import LoginPage from './pages/Login'
 import Dashboard1 from './pages/Dashboard1'
 import AddPath from './pages/AddPath'
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
 const isAdmin = 'true'
 
-export const socket = io("http://localhost:3000",{
+export const socket = io(`${backendURL}`,{
   query: {isAdmin}
 });
 

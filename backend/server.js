@@ -4,6 +4,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const methods = require('methods');
 const path = require('path');
+require('dotenv').config();
 
 const adminRouter = require('./routes/admin.routes');
 const areaRouter = require('./routes/area.routes');
@@ -19,11 +20,15 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 const server = http.createServer(app);
+const adminURL = process.env.ADMIN_URL;
+const driverURL = process.env.DRIVER_URL;
 const io = new Server(server, {
     cors: {
         origin: [
             "http://localhost:5173",
-            "http://localhost:5174"
+            "http://localhost:5174",
+            `${adminURL}`,
+            `${driverURL}`
         ],
         methods: ['GET', 'POST', 'DELETE'],
         credentials: true
@@ -35,16 +40,16 @@ io.on("connection", (socket) => {
     console.log("♪(^∇^*)  A new user connected with ID ", socket.id, ". Is Admin ? ", isAdmin);
     socket.join("AdminTrackingRoom")
     socket.on('send location', (data) => {
-        console.log(data.areaId.areaId , data.location.latitude, data.location.longitude)
-        socket.to("AdminTrackingRoom").emit("receive location", {id: socket.id, areaId: data.areaId.areaId, ...data});
+        console.log(data.pathId.pathId , data.location.latitude, data.location.longitude)
+        socket.to("AdminTrackingRoom").emit("receive location", {id: socket.id, pathId: data.pathId.pathId, ...data});
     })
     socket.on('stop location', (data) => {
-        socket.to("AdminTrackingRoom").emit("driver disconnected", {id: socket.id, areaId: data.areaId.areaId})
+        socket.to("AdminTrackingRoom").emit("driver disconnected", {id: socket.id, pathId: data.pathId.pathId})
     })
     socket.on('disconnect', () => {
         console.log("＞︿＜  An user disconnected of ID ", socket.id, ". Is Admin ? ", isAdmin);
         // if(!isAdmin){
-        //     socket.to("AdminTrackingRoom").emit("driver disconnected", {id: socket.id, areaId: data.areaId.areaId})
+        //     socket.to("AdminTrackingRoom").emit("driver disconnected", {id: socket.id, pathId: data.pathId.pathId})
         // }
     })
 })
@@ -57,7 +62,9 @@ app.use(
     cors({
         origin: [
             "http://localhost:5173",
-            "http://localhost:5174"
+            "http://localhost:5174",
+            `${adminURL}`,
+            `${driverURL}`
         ],
         methods: ["GET", "POST", "DELETE"],
         credentials: true
@@ -78,6 +85,6 @@ app.get("/", (req, res) => {
     res.send("server is running .... ");
 });
 
-server.listen(3000, () => {    // handle the port****
-    console.log("Server is running on port 3000")
+server.listen(process.env.PORT, () => {
+    console.log("Server is running on port", process.env.PORT)
 });

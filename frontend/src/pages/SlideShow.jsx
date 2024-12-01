@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
 import AssignCardComponent from '../components/AssignCardComponent';
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
 // const spanStyle = {
 //   padding: '20px',
@@ -39,7 +40,7 @@ const SlideShow = () => {
 
   const fetchProfiles = async () => {
     try {
-      const response = await fetch('http://localhost:3000/assign/getAllAssigns?populateArea=true&populateDustbin=true&populateDriver=true&populateVehicle=true', {
+      const response = await fetch(`${backendURL}/assign/getAllAssigns?populateArea=true&populateDustbin=true&populateDriver=true&populateVehicle=true`, {
         method: 'GET',
         // headers: headers
       });

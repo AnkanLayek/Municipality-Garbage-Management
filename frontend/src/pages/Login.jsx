@@ -2,7 +2,7 @@ import { useState } from "react";
 import React from "react";
 import {Navigate, useNavigate} from 'react-router-dom'
 import NavBarComponent from "../components/NavBarComponent";
-
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -36,7 +36,7 @@ const LoginPage = () => {
         // else{
         //     setFormErr('invalid credentials!!')
         // }
-        const response = await fetch("http://localhost:3000/admin/login", {
+        const response = await fetch(`${backendURL}/admin/login`, {
             method: "POST",
             headers: {
                 'Content-Type' : 'application/json'
