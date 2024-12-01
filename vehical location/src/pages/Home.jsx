@@ -10,6 +10,7 @@ import dustbinIcon1 from '../assets/dustbin1.png'
 import carIcon from "../assets/carMarker.png"
 import { io } from "socket.io-client";
 import { socket } from "../App";
+const backendURL = import.meta.env.VITE_BACKEND_URL
 
 function Home() {
     const [pathId, setPathId] = useState();
@@ -64,7 +65,7 @@ function Home() {
 
     const getAssignDetails = async () => {
         const response = await fetch(
-            `http://localhost:3000/assign/getAllAssigns/PATH001?populatePath=true&populateDustbin=true`,
+            `${backendURL}/assign/getAllAssigns/PATH001?populatePath=true&populateDustbin=true`,
             {
                 method: 'GET',
             }
