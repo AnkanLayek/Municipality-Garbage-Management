@@ -13,6 +13,7 @@ const dustbinRouter = require('./routes/dustbin.routes');
 const driverRouter = require('./routes/driver.routes');
 const assignRouter = require('./routes/assign.routes');
 const vehicleRouter = require('./routes/vehicle.routes');
+const trackingStatusRouter = require('./routes/trackingStatus.routes');
 const cookieParser = require('cookie-parser');
 const db = require('./configs/mongooseConnection');
 
@@ -80,6 +81,7 @@ app.use("/dustbin", dustbinRouter);
 app.use("/driver", driverRouter);
 app.use("/assign", assignRouter);
 app.use("/vehicle", vehicleRouter);
+app.use("/trackingStatus", trackingStatusRouter);
 
 app.get("/", (req, res) => {
     res.send("server is running .... ");
