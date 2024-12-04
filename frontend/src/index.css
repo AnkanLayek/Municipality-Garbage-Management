@@ -33,3 +33,7 @@
 .sidePathListContainer::-webkit-scrollbar {
     display: none;
 }
+
+.allStatusContainer::-webkit-scrollbar {
+    display: none;
+}

@@ -39,13 +39,18 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     const isAdmin = socket.handshake.query.isAdmin === 'true'
     console.log("♪(^∇^*)  A new user connected with ID ", socket.id, ". Is Admin ? ", isAdmin);
-    socket.join("AdminTrackingRoom")
+    if(isAdmin){
+        socket.join("AdminTrackingRoom")
+    }
     socket.on('send location', (data) => {
         console.log(data.pathId.pathId , data.location.latitude, data.location.longitude)
         socket.to("AdminTrackingRoom").emit("receive location", {id: socket.id, pathId: data.pathId.pathId, ...data});
     })
     socket.on('stop location', (data) => {
         socket.to("AdminTrackingRoom").emit("driver disconnected", {id: socket.id, pathId: data.pathId.pathId})
+    })
+    socket.on('status created', () => {
+        socket.to("AdminTrackingRoom").emit("update statuses")
     })
     socket.on('disconnect', () => {
         console.log("＞︿＜  An user disconnected of ID ", socket.id, ". Is Admin ? ", isAdmin);

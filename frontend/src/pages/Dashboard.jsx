@@ -6,6 +6,7 @@ import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons
 import AssignCardComponent from '../components/AssignCardComponent';
 import NavBarComponent from '../components/NavBarComponent';
 import { Slide } from 'react-slideshow-image';
+import { socket } from "../App";
 import 'react-slideshow-image/dist/styles.css'
 import '../styles/Dashboard.css'
 const backendURL = import.meta.env.VITE_BACKEND_URL
@@ -20,8 +21,9 @@ const backendURL = import.meta.env.VITE_BACKEND_URL
 // }
 
 const Dashboard = () => {
-  const [profiles, setProfiles] = useState([]);
-  const [notifications, setNotifications] = useState([]);
+  const [assigns, setAssigns] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+  const [updateStatus, setUpdateStatus] = useState(true)
   const [loading, setLoading] = useState(true);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
   const slideContainerRef = useRef(null);
@@ -30,15 +32,19 @@ const Dashboard = () => {
 
   const navigate = useNavigate()
 
+  socket.on('update statuses', () => {
+    setUpdateStatus(prev => !prev);
+  })
+
   const nextSlide = () => {
-    const nextIdx = (currIdx + 1) % profiles.length;
+    const nextIdx = (currIdx + 1) % assigns.length;
     setCurrIdx(nextIdx);
   }
 
   const prevSlide = () => {
     let prevIdx;
     if(currIdx == 0){
-      prevIdx = profiles.length - 1;
+      prevIdx = assigns.length - 1;
     }
     else {
       prevIdx = currIdx - 1;
@@ -46,29 +52,46 @@ const Dashboard = () => {
     setCurrIdx(prevIdx);
   }
 
+  const fetchStatuses = async () => {
+    try {
+      const response = await fetch(`${backendURL}/trackingStatus/getAllStatuses`, {
+        method: 'GET'
+      });
+      const data = await response.json();
+      if(response.ok){
+        setStatuses(data.statuses);
+      }
+    } catch(error) {
+      console.error('Error fetching tracking statuses:', error);
+    }
+  }
 
-
-
-
-
-
-
-  const fetchProfiles = async () => {
+  const fetchAssigns = async () => {
     try {
       const response = await fetch(`${backendURL}/assign/getAllAssigns?populatePath=true&populateDustbin=true&populateDriver=true&populateVehicle=true`, {
         method: 'GET',
         // headers: headers
       });
       const data = await response.json();
-      setProfiles(data.assignments);
-      console.log(data.assignments);
+      if(response.ok){
+        setAssigns(data.assignments);
+        console.log(data.assignments);
+      }
       // slideShow();
     } catch (error) {
-      console.error('Error fetching profiles:', error);
+      console.error('Error fetching assigns:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchStatuses();
+  }, [updateStatus])
+
+  useEffect(() => {
+    fetchAssigns(); // Fetch assigns initially
+  }, [])
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -77,11 +100,10 @@ const Dashboard = () => {
       return
     }
     console.log(storedToken)
-    // if()
-    fetchProfiles(); // Fetch profiles initially
+    
   }, []); // Empty dependency array to run only once on mount
 
-  // return profiles;
+  // return assigns;
 
   return (
     <>
@@ -90,43 +112,82 @@ const Dashboard = () => {
           <div className='fixed w-full top-0 z-10'>
             <NavBarComponent />
           </div>
-          <div className="flex justify-between mt-16">
-            <div className="w-[60%] px-5 py-3">
-              <section className="notification">
-                <h2 className='text-3xl font-semibold'>Tracking Status</h2>
-              </section>
+          <div className="h-[calc(100vh-4rem)] flex justify-between mt-16">
+            {/* tracking status portion */}
+            <div className="h-full w-[60%] px-5 py-3">
+              <div className="status h-full w-full flex flex-col">
+                <h2 className='text-3xl font-semibold mb-4'>Tracking Status</h2>
+                <div className='allStatusContainer h-full w-full p-5 rounded-lg overflow-y-auto'
+                  style={{ boxShadow : 'inset -2px 2px 5px 3px rgb(0 0 0 / 0.05), inset 2px -2px 5px 3px rgb(0 0 0 / 0.05)' }}
+                >
+                  {(statuses.length == 0)
+                    ? <div className='h-full flex justify-center items-center text-gray-400'>
+                      No Tracking Updates
+                    </div>
+                    : <div className='flex flex-col gap-3'>
+                      {statuses.map((eachStatus) => (
+                        <div className='w-full p-2 bg-blue-200 text-blue-900 border-[1px] border-blue-400 rounded-md' key={eachStatus.trackingStatusId} >
+                          <h3 className='font-semibold text-lg'>
+                            {eachStatus.title}
+                          </h3>
+                          <p>
+                            {eachStatus.message}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  }
+                </div>
+                
+              </div>
             </div>
+
+            {/* assignments portion */}
             <div className="w-[40%] px-5 py-3 relative">
               <div className="flex flex-col items-center relative  w-full h-full">
                 <h2 className='text-3xl font-semibold mb-4'>Assignments</h2>
-                {/* <Slide> */}
-                <div className='relative'>
-                    {profiles.map((eachProfile, idx) => (
+                {(assigns.length == 0)
+                  ? <div className='h-[50vh] flex items-center text-gray-400'>
+                    No Assignments
+                  </div>
+                  : <div className='relative'>
+                    {assigns.map((eachAssign, idx) => (
                       <div key={idx} className={`slide center   ${idx == currIdx ? "active" : ""}`} >
                         <AssignCardComponent
-                            key={eachProfile._id}
-                            pathName={eachProfile.pathId.pathName}
-                            pathId={eachProfile.pathId.pathId}
-                            dustbinNo={eachProfile.pathId.noOfDustbins}
-                            driverName={eachProfile.driverUsername.fullName}
-                            vehicleNo={eachProfile.vehicleReg.vehicleReg}
-                            className='driverSlides visible'
-                            // {...console.log(eachProfile)}
+                          key={eachAssign._id}
+                          pathName={eachAssign.pathId.pathName}
+                          pathId={eachAssign.pathId.pathId}
+                          dustbinNo={eachAssign.pathId.noOfDustbins}
+                          driverName={eachAssign.driverUsername.fullName}
+                          vehicleNo={eachAssign.vehicleReg.vehicleReg}
+                          className='driverSlides visible'
+                          // {...console.log(eachassign)}
                         />
 
                       </div>
                     ))}
                     <button className='text-6xl text-gray-500 rounded-l-md absolute top-1/2 right-0 -translate-y-1/2 px-3 py-3'
-                  onClick={nextSlide}
-                >
-                  <FontAwesomeIcon icon={faChevronRight}/>
-                </button>
-                <button className='text-6xl text-gray-500 rounded-l-md absolute top-1/2 left-0 -translate-y-1/2 px-3 py-3'
-                  onClick={prevSlide}
-                >
-                  <FontAwesomeIcon icon={faChevronLeft}/>
-                </button>
-                </div>
+                      onClick={nextSlide}
+                    >
+                      <FontAwesomeIcon icon={faChevronRight}/>
+                    </button>
+                    <button className='text-6xl text-gray-500 rounded-l-md absolute top-1/2 left-0 -translate-y-1/2 px-3 py-3'
+                      onClick={prevSlide}
+                    >
+                      <FontAwesomeIcon icon={faChevronLeft}/>
+                    </button>
+                    <div className='absolute bottom-2 flex gap-2 left-1/2 -translate-x-1/2'>
+                      {assigns.map((eachAssign, idx) => (
+                        <div key={idx}
+                          className={`w-2 h-2 rounded-full transition-all duration-200
+                                      ${(idx == currIdx) ? 'bg-gray-600' : 'bg-gray-400'}`}
+                        ></div>
+                      ))}
+                    </div>
+                  </div>
+                }
+                {/* <Slide> */}
+                
                 {/* </Slide> */}
 
                 

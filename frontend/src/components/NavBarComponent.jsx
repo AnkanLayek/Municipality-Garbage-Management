@@ -1,7 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faBell, faUser } from "@fortawesome/free-solid-svg-icons"
+import { faBell, faListCheck, faUser } from "@fortawesome/free-solid-svg-icons"
 import { useNavigate } from "react-router-dom"
 import { faEdit, faXmark, faBars, faClockRotateLeft, faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons"
+import { IconLayoutDashboard, IconMap2 } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 
 
@@ -185,10 +186,30 @@ const NavBarComponent = () => {
                     </div>
                 </div>
                 <div className="flex flex-col">
-                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full cursor-pointer" onClick={navigateDashboard}>Dashboard</div>
-                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full cursor-pointer" onClick={navigatePath}>Manage Paths</div>
-                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full cursor-pointer">Manage</div>
-                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full cursor-pointer" onClick={navigateAssign}>Assign</div>
+                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer" onClick={navigateDashboard}>
+                        <div className="w-10">
+                            <IconLayoutDashboard />
+                        </div>
+                        <p>Dashboard</p>
+                    </div>
+                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer" onClick={navigatePath}>
+                        <div className="w-10">
+                            <IconMap2 />
+                        </div>
+                        <p>Manage Paths</p>
+                    </div>
+                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer">
+                        <div className="w-10">
+                            
+                        </div>
+                        <p>Manage</p>
+                    </div>
+                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer" onClick={navigateAssign}>
+                        <div className="w-10 text-xl pl-[1.5px]">
+                            <FontAwesomeIcon icon={faListCheck}/>
+                        </div>
+                        <p>Assign</p>
+                    </div>
                 </div>
             </div>
 

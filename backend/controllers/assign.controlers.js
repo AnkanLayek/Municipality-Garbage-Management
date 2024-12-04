@@ -97,19 +97,19 @@ class assignController {
                     }
                     if(populateVehicle == 'true'){
                         assignment = await assignment.populate({
-                            path: 'vehicleId',
+                            path: 'vehicleReg',
                             model: 'vehicle',
-                            localField: 'vehicleId',
-                            foreignField: 'vehicleId'
+                            localField: 'vehicleReg',
+                            foreignField: 'vehicleReg'
                         });
                     }
                     return res.status(200).json({ message: "Assignment fetched successfully", assignment: assignment });
                 }
-                return res.status(500).json({ message: "Could not fetch assignment details" });
+                return res.status(404).json({ message: "No assignment found for the path" });
             }
 
             const assignments = await assignModel.find();
-            if(assignments){
+            if(assignments.length > 0){
                 if (populatePath === 'true') {
                     for(let eachAssignment of assignments) {
                         eachAssignment = await eachAssignment.populate({
@@ -152,7 +152,7 @@ class assignController {
                 }
                 return res.status(200).json({ message: "Assignments fetched successfully", assignments: assignments });
             }
-            return res.status(500).json({ message: "Could not fetch assignment details" });
+            return res.status(200).json({ message: "No assignment found", assignments: [] });
         }
         catch(err) {
             console.log(err);

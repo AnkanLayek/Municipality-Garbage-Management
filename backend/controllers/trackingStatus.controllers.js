@@ -71,12 +71,12 @@ class trackingStatusController {
                             $gte: new Date(startDate),
                             $lte: new Date(endDate)
                         }
-                    })
+                    }).sort({ createdAt: -1 })
                 }
 
                 // If filter is other than timestamp
                 else{
-                    statuses = await trackingStatusModel.find({[queryName] : queryVal})
+                    statuses = await trackingStatusModel.find({[queryName] : queryVal}).sort({ createdAt: -1 })
                 }
                 
                 if(statuses.length > 0){
@@ -87,10 +87,10 @@ class trackingStatusController {
 
             // If no search filter is provided, return all the statuses
             else{
-                const statuses = await trackingStatusModel.find()
+                const statuses = await trackingStatusModel.find().sort({ createdAt: -1 })
                 
                 if(statuses.length > 0){
-                    return res.status(200).json({message: "All Tracking status message fetched succesfully",statuses, time: `${statuses[0].createdAt.getHour()}`});  // 200 OK
+                    return res.status(200).json({message: "All Tracking status message fetched succesfully",statuses});  // 200 OK
                 }
                 return res.status(404).json({message: "No tracking status found"});  // 500 Internal server error
             }

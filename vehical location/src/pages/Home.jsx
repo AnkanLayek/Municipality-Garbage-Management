@@ -15,7 +15,7 @@ const backendURL = import.meta.env.VITE_BACKEND_URL
 function Home() {
     const [pathId, setPathId] = useState();
     const [driver, setDriver] = useState();
-    const [vehical, setVehical] = useState();
+    const [vehicle, setVehicle] = useState();
     const [dustbins, setDustbins] = useState([]);
     const [assignment, setAssignment] = useState();
 
@@ -41,14 +41,78 @@ function Home() {
         popupAnchor: [0, -45]
     });
 
+    const createStartJrnyStatus = async () => {
+        const response = await fetch(`${backendURL}/trackingStatus/create`, {
+            method: 'POST',
+            headers: {
+                'Content-type' : 'application/json'
+            },
+            body: JSON.stringify({
+                title: 'Started Journey',
+                message: `Vehicle no. ${vehicle.vehicleReg}, driven by ${driver.fullName}, started journey on path ID ${pathId.pathId}`,
+                pathId: pathId.pathId,
+                driverUsername: driver.userame,
+                vehicleReg: vehicle.vehicleReg
+            })
+        })
+        if(response.ok){
+            socket.emit('status created');
+        }
+    }
+
+    const createEndJrnyStatus = async () => {
+        const response = await fetch(`${backendURL}/trackingStatus/create`, {
+            method: 'POST',
+            headers: {
+                'Content-type' : 'application/json'
+            },
+            body: JSON.stringify({
+                title: 'Ended Journey',
+                message: `Vehicle no. ${vehicle.vehicleReg}, driven by ${driver.fullName}, ended journey on path ID ${pathId.pathId}`,
+                pathId: pathId.pathId,
+                driverUsername: driver.userame,
+                vehicleReg: vehicle.vehicleReg
+            })
+        })
+        if(response.ok){
+            socket.emit('status created');
+        }
+    }
+
+    const createDustbinMatchStatus = async (currLat, currLng) => {
+        dustbins.map(async (eachDustbin) => {
+            if(((eachDustbin.coords.lat - currLat == 0.0001) || (eachDustbin.coords.lat - currLat == -0.0001)) && ((eachDustbin.coords.lng - currLng == 0.0001) || (eachDustbin.coords.lng - currLng == 0.0001))){
+                const response = await fetch(`${backendURL}/trackingStatus/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-type' : 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: 'Dustbin Reached',
+                        message: `Vehicle no. ${vehicle.vehicleReg}, driven by ${driver.fullName}, reached dustbin ID ${eachDustbin.dustbinId}, located on path ID ${pathId.pathId}`,
+                        pathId: pathId.pathId,
+                        dustbinId: eachDustbin.dustbinId,
+                        driverUsername: driver.userame,
+                        vehicleReg: vehicle.vehicleReg
+                    })
+                })
+                if(response.ok){
+                    socket.emit('status created');
+                }
+            }
+        })
+    }
+
     const startJrny = () => {
         setIsStarted(true);
+        createStartJrnyStatus()
         const id = navigator.geolocation.watchPosition((position)=>{
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
             socket.emit("send location", {location: position.coords, pathId: pathId});
             setMapCenter({lat: lat, lng: lng});
-            setCarPosition({lat: lat, lng: lng})
+            setCarPosition({lat: lat, lng: lng});
+            createDustbinMatchStatus(lat, lng);
         });
 
         setWatchId(id);
@@ -58,6 +122,7 @@ function Home() {
 
     const endJrny = () => {
         setIsStarted(false);
+        createEndJrnyStatus();
         navigator.geolocation.clearWatch(watchId);
         setCarPosition({lat: undefined, lng: undefined});
         socket.emit("stop location", {pathId: pathId})
@@ -65,18 +130,19 @@ function Home() {
 
     const getAssignDetails = async () => {
         const response = await fetch(
-            `${backendURL}/assign/getAllAssigns/PATH001?populatePath=true&populateDustbin=true`,
+            `${backendURL}/assign/getAllAssigns/PATH002?populatePath=true&populateDustbin=true&populateDriver=true&populateVehicle=true`,
             {
                 method: 'GET',
             }
         )
 
         const data = await response.json();
+        console.log(data)
         if(response.ok){
             setAssignment(data.assignment);
             setPathId(data.assignment.pathId);
             setDriver(data.assignment.driverUsername);
-            setVehical(data.assignment.vehicalReg);
+            setVehicle(data.assignment.vehicleReg);
             setDustbins(data.assignment.pathId.dustbins);
         }
     }
@@ -89,7 +155,18 @@ function Home() {
         checkAspectRatio();
         window.addEventListener('resize', checkAspectRatio);
 
-        return () => window.removeEventListener('resize', checkAspectRatio);
+        socket.on('disconnect', () => {
+            setIsStarted(false);
+            createEndJrnyStatus();
+            navigator.geolocation.clearWatch(watchId);
+            setCarPosition({lat: undefined, lng: undefined});
+            socket.emit("stop location", {pathId: pathId});
+        })
+
+        return () => {
+            window.removeEventListener('resize', checkAspectRatio);
+            socket.disconnect()
+        }
     }, []);
 
     useEffect(() => {

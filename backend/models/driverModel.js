@@ -19,6 +19,10 @@ const driverModel = mongoose.Schema({
         type: String,
         required: true
     },
+    phNo : {
+        type: Number,
+        required: true
+    },
     profilePic : String
 });
 
