@@ -9,6 +9,8 @@ import Assignment from './pages/Assignment'
 import LoginPage from './pages/Login'
 import Dashboard1 from './pages/Dashboard1'
 import AddPath from './pages/AddPath'
+import AddDustbin from './pages/AddDustbin'
+
 const backendURL = import.meta.env.VITE_BACKEND_URL
 
 const isAdmin = 'true'
@@ -29,6 +31,7 @@ function App() {
           <Route path='/track' element={< TrackMap />} />
           <Route path='/assign' element={<Assignment />} />
           <Route path='/addPath' element={<AddPath />} />
+          <Route path='/addDustbin' element={<AddDustbin />} />
 
           <Route path='/slideShow' element={< SlideShow />} />
         </Routes>

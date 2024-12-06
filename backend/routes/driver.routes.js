@@ -3,7 +3,7 @@ const { driverRegister, driverLogin, driverLogout, getAllDrivers } = require('..
 const route = express.Router();
 
 route.post("/register", driverRegister);
-route.get("/login", driverLogin);
+route.post("/login", driverLogin);
 route.get("/logout", driverLogout);
 route.get("/getAllDrivers/:username?", getAllDrivers);
 

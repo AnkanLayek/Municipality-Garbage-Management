@@ -127,10 +127,10 @@ const Dashboard = () => {
                     : <div className='flex flex-col gap-3'>
                       {statuses.map((eachStatus) => (
                         <div className='w-full p-2 bg-blue-200 text-blue-900 border-[1px] border-blue-400 rounded-md' key={eachStatus.trackingStatusId} >
-                          <h3 className='font-semibold text-lg'>
+                          <h3 className='font-semibold text-lg truncate'>
                             {eachStatus.title}
                           </h3>
-                          <p>
+                          <p className='truncate'>
                             {eachStatus.message}
                           </p>
                         </div>
@@ -201,7 +201,7 @@ const Dashboard = () => {
       }
     </>
     
-    
+     
   );
 };
 

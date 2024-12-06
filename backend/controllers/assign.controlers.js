@@ -60,11 +60,60 @@ class assignController {
 
     async getAllAssigns(req, res) {
         try {
-            const { pathId } = req.params;
+            let { pathId, driverUsername } = req.params;
             const { populatePath, populateDustbin, populateDriver, populateVehicle } = req.query;
+
+            if(pathId == '_'){
+                pathId = undefined
+            }
 
             if(pathId) {
                 let assignment = await assignModel.findOne({pathId});
+                
+                if(assignment){
+                    // if(populatePath == 'true'){
+                        // In your function to populate pathId
+                        if (populatePath === 'true') {
+                            assignment = await assignment.populate({
+                                path: 'pathId',
+                                localField: 'pathId',      // Field in assignModel to match
+                                foreignField: 'pathId',    // Field in pathModel to match
+                            });
+                        }
+
+                        if(populateDustbin == 'true'){
+                            assignment = await assignment.populate({
+                                path: 'pathId.dustbins',
+                                localField: 'dustbins',
+                                foreignField: 'dustbinId' 
+                            })
+                        }
+
+                    // }
+                    if(populateDriver == 'true'){
+                        assignment = await assignment.populate({
+                            path: 'driverUsername',
+                            model: 'driver',
+                            localField: 'username',
+                            foreignField: 'username',
+                        });
+                        // assignment = assignment.select("-password");
+                    }
+                    if(populateVehicle == 'true'){
+                        assignment = await assignment.populate({
+                            path: 'vehicleReg',
+                            model: 'vehicle',
+                            localField: 'vehicleReg',
+                            foreignField: 'vehicleReg'
+                        });
+                    }
+                    return res.status(200).json({ message: "Assignment fetched successfully", assignment: assignment });
+                }
+                return res.status(404).json({ message: "No assignment found for the path" });
+            }
+
+            if(driverUsername) {
+                let assignment = await assignModel.findOne({driverUsername});
                 
                 if(assignment){
                     // if(populatePath == 'true'){

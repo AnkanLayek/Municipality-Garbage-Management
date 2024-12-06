@@ -103,6 +103,12 @@ const NavBarComponent = () => {
         setExpandedMenu(false)
         navigate("/addPath")
     }
+    
+    const navigateDustbin = () => {
+        setExpandedProfile(false)
+        setExpandedMenu(false)
+        navigate("/addDustbin")
+    }
 
     const navigateAssign = () => {
         setExpandedProfile(false)
@@ -197,6 +203,12 @@ const NavBarComponent = () => {
                             <IconMap2 />
                         </div>
                         <p>Manage Paths</p>
+                    </div>
+                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer" onClick={navigateDustbin}>
+                        <div className="w-10">
+                            <IconMap2 />
+                        </div>
+                        <p>Manage Dustbins</p>
                     </div>
                     <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer">
                         <div className="w-10">

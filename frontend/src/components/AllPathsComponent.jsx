@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react"
+import dotPointIcon from "../assets/dotPointMarker.png"
 import MapComponent from "./MapComponent";
 import RoutingComponent from "./RoutingComponent";
+import { Marker } from "leaflet";
 const backendURL = import.meta.env.VITE_BACKEND_URL
 
-const AllPathsComponent = ({ currentPathId, onPathClick, refreshPaths }) => {
-    const [paths, setPaths] = useState([])
+const AllPathsComponent = ({ currentPathId, onPathClick, refreshPaths, markerPoints=[] }) => {
+    const [paths, setPaths] = useState([]);
+
+    // custom icon for dot point
+    const dotPointMarker = new L.icon({
+        iconUrl: dotPointIcon,
+        iconSize: [10, 10],
+        iconAnchor: [5, 5],
+        popupAnchor: [0, -45]
+    });
 
     const getAllPaths = async () => {
         const response = await fetch(`${backendURL}/path/getAllPaths`, {
@@ -13,13 +23,12 @@ const AllPathsComponent = ({ currentPathId, onPathClick, refreshPaths }) => {
         const data = await response.json();
         if(response.ok){
             setPaths(data.paths)
-            
         }
     }
 
     useEffect(() => {
         getAllPaths();
-    },[refreshPaths])
+    },[refreshPaths, markerPoints])
 
     return (
         <>
@@ -32,6 +41,14 @@ const AllPathsComponent = ({ currentPathId, onPathClick, refreshPaths }) => {
                     >
                         <div className="h-full w-full rounded-lg overflow-hidden">
                             <MapComponent zoom={11} allowWheelZoom={false} allowDblClickZoom={false} allowDragging={false}>
+                                {/* {(markerPoints.length > 0)
+                                    ? <>
+                                        {markerPoints.map((eachPoint) => {
+                                            <Marker icon={dotPointMarker} position={[eachPoint.lat, eachPoint.lng]}></Marker>
+                                        })}
+                                    </>
+                                    : <></>
+                                } */}
                                 <RoutingComponent checkPoints={eachPath.checkPoints} weight={3}/>
                             </MapComponent>
                         </div>

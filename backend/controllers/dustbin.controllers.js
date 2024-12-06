@@ -48,7 +48,7 @@ class dustbinController {
             // Fetch all dustbins of the provided path
             const dustbins = await dustbinModel.find({ pathId });
             if(dustbins.length == 0){
-                return res.status(404).json({message: "No dustbin found", dustbins: []});  // 404 Not found
+                return res.status(200).json({message: "No dustbin found", dustbins: []});  // 200 OK
             }
             return res.status(200).json({message: "Dustbins fetched successfully", dustbins: dustbins});  // 200 OK
 
