@@ -258,7 +258,7 @@ const AddDustbin = () => {
                                         </div> */}
 
                                         {/* fetching all the paths */}
-                                        <AllPathsComponent currentPathId={pathId} onPathClick={handleNavigation} refreshPaths={refreshPaths} markerPoints={dustbins} />
+                                        <AllPathsComponent currentPathId={pathId} onPathClick={handleNavigation} refreshPaths={refreshPaths} />
                                     </div>
                                 </div>
                             </div>
