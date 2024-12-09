@@ -43,7 +43,6 @@ io.on("connection", (socket) => {
         socket.join("AdminTrackingRoom")
     }
     socket.on('send location', (data) => {
-        console.log(data.pathId.pathId , data.location.latitude, data.location.longitude)
         socket.to("AdminTrackingRoom").emit("receive location", {id: socket.id, pathId: data.pathId.pathId, ...data});
     })
     socket.on('stop location', (data) => {

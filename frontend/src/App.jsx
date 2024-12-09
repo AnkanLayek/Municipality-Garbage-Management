@@ -10,6 +10,8 @@ import LoginPage from './pages/Login'
 import Dashboard1 from './pages/Dashboard1'
 import AddPath from './pages/AddPath'
 import AddDustbin from './pages/AddDustbin'
+import AddVehicle from './pages/AddVehicle'
+import AddDriver from './pages/AddDriver'
 
 const backendURL = import.meta.env.VITE_BACKEND_URL
 
@@ -32,6 +34,8 @@ function App() {
           <Route path='/assign' element={<Assignment />} />
           <Route path='/addPath' element={<AddPath />} />
           <Route path='/addDustbin' element={<AddDustbin />} />
+          <Route path='/addVehicle' element={<AddVehicle />} />
+          <Route path='/addDriver' element={<AddDriver />} />
 
           <Route path='/slideShow' element={< SlideShow />} />
         </Routes>

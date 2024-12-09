@@ -245,7 +245,7 @@ const AddPath = () => {
                     <>
                         {(isBellowAspect || isExpanded)
                             // side bar of path list container
-                            ? <div className={`sidePathListContainer w-96 h-full bg-white ${!isBellowAspect ? 'absolute' : ''} z-[5] overflow-y-auto`}>
+                            ? <div className={`sidePathListContainer w-96 h-full bg-white ${!isBellowAspect ? 'absolute' : ''} z-[5] overflow-y-auto`}>    {/* index.css */}
                                 {!isBellowAspect
                                     ? <div className="m-4 flex flex-row-reverse">
                                         <div className="w-9 h-9 p-2 text-xl border-2 border-black rounded-full flex justify-center items-center cursor-pointer"

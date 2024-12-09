@@ -2,6 +2,7 @@ import { useState } from "react";
 import React from "react";
 import {Navigate, useNavigate} from 'react-router-dom'
 import NavBarComponent from "../components/NavBarComponent";
+import loginBg from "../assets/loginBG.png"
 const backendURL = import.meta.env.VITE_BACKEND_URL
 
 const LoginPage = () => {
@@ -66,22 +67,31 @@ const LoginPage = () => {
             <div className='fixed w-full top-0 z-10'>
                 <NavBarComponent />
             </div>
-            <div className="w-full mt-16 px-5 py-3 flex justify-center items-center" style={{height: "calc(100vh - 64px)"}}>
-                <div className="loginContainer flex flex-col items-center p-5" style={{background: "linear-gradient(45deg, #e6f5e6, #b9ebb9)"}}>
+            <div
+                className="loginPageMain w-full mt-16 px-5 py-3 flex justify-end items-center relative"
+                style={{height: "calc(100vh - 64px)", backgroundImage: `url(${loginBg})`, backgroundSize: "cover", backgroundPosition: "center"}}
+            >
+                <div
+                    className="loginContainer absolute p-5 rounded-lg flex flex-col items-center backdrop-blur-lg"
+                    style={{background: "linear-gradient(135deg, rgba(245,252,245,0.3), rgba(255,255,255,0.2)", boxShadow: '2px 2px 7px 5px rgba(0,0,0,0.2)'}}
+                >
                     <h1 className="text-3xl mb-10">LogIn</h1>
                     <form className="flex flex-col items-center"
                         onSubmit={handleLogIn}>
-                        <div className="inputsContainer flex flex-col gap-3">
+                        <div className="inputsContainer w-80 flex flex-col gap-3">
                             <div className="flex flex-col">
                                 <label htmlFor="email">Email</label>
                                 <input type="email" id='email' name="email"
-                                    className="px-3 py-2 w-80 border-2 border-black rounded-md"
-                                    onChange={(e) => setEmail(e.target.value)} />
+                                    className="px-3 py-2 rounded-md backdrop-blur-lg"
+                                    style={{backgroundColor: "rgba(255,255,255,0.4)"}}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
                             </div>
                             <div className="flex flex-col">
                                 <label htmlFor="password">Password</label>
                                 <input type="password" id='password' name="password"
-                                    className="px-3 py-2 w-80 border-2 border-black rounded-md"
+                                    className="px-3 py-2 rounded-md backdrop-blur-lg"
+                                    style={{backgroundColor: "rgba(255,255,255,0.4)"}}
                                     onChange={(e) => setPassword(e.target.value)} />
                             </div>
                         </div>

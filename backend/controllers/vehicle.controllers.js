@@ -46,12 +46,22 @@ class vehicleController {
 
             const { vehicleId } = req.params;
 
-            // Fetch the vehicle details
-            const vehicle = await vehicleModel.findOne({ vehicleId });
-            if(vehicle){
-                return res.status(200).json({message: "Vehicle fetched successfully", vehicle: vehicle});  // 200 OK
+            // Fetch particular vehicle details if vehicle id is provided
+            if(vehicleId){
+                const vehicle = await vehicleModel.findOne({ vehicleId });
+                if(vehicle){
+                    return res.status(200).json({message: "Vehicle fetched successfully", vehicle: vehicle});  // 200 OK
+                }
+                return res.status(404).json({message: "No such vehicle found"});  // 404 Not found
             }
-            return res.status(404).json({message: "No such vehicle found", dustbins: []});  // 404 Not found
+
+            // Fetch all vehicle details if no vehicle id is provided
+            const vehicles = await vehicleModel.find();
+            if(vehicles){
+                return res.status(200).json({message: "Vehicle fetched successfully", vehicles: vehicles});  // 200 OK
+            }
+            return res.status(200).json({message: "No vehicles are registered", vehicles: []});  // 404 Not found
+            
 
         } catch(err){
             console.error(err)

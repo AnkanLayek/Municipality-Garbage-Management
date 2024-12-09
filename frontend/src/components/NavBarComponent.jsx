@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faBell, faListCheck, faUser } from "@fortawesome/free-solid-svg-icons"
 import { useNavigate } from "react-router-dom"
-import { faEdit, faXmark, faBars, faClockRotateLeft, faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons"
+import { faEdit, faXmark, faBars, faClockRotateLeft, faArrowRightFromBracket, faTruckFast, faTrashArrowUp } from "@fortawesome/free-solid-svg-icons"
 import { IconLayoutDashboard, IconMap2 } from "@tabler/icons-react"
 import { useEffect, useState } from "react"
 
@@ -110,6 +110,12 @@ const NavBarComponent = () => {
         navigate("/addDustbin")
     }
 
+    const navigateVehicle = () => {
+        setExpandedProfile(false)
+        setExpandedMenu(false)
+        navigate("/addVehicle")
+    }
+
     const navigateAssign = () => {
         setExpandedProfile(false)
         setExpandedMenu(false)
@@ -126,8 +132,8 @@ const NavBarComponent = () => {
                         </div>
                         : <></>
                     }
-                    <p className="text-3xl font-bold">
-                        Municipality Garbage Management
+                    <p className="navAppName text-3xl font-bold">
+                        
                     </p>
                 </div>
                 {((localStorage.getItem("token") != '') && (localStorage.getItem("token") != null))
@@ -205,8 +211,8 @@ const NavBarComponent = () => {
                         <p>Manage Paths</p>
                     </div>
                     <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer" onClick={navigateDustbin}>
-                        <div className="w-10">
-                            <IconMap2 />
+                        <div className="w-10 pl-[4px]">
+                        <FontAwesomeIcon icon={faTrashArrowUp}/>
                         </div>
                         <p>Manage Dustbins</p>
                     </div>
@@ -216,8 +222,14 @@ const NavBarComponent = () => {
                         </div>
                         <p>Manage</p>
                     </div>
+                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer" onClick={navigateVehicle}>
+                        <div className="w-10">
+                            <FontAwesomeIcon icon={faTruckFast}/>
+                        </div>
+                        <p>Manage Vehicles</p>
+                    </div>
                     <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer" onClick={navigateAssign}>
-                        <div className="w-10 text-xl pl-[1.5px]">
+                        <div className="w-10 text-xl pl-[2px]">
                             <FontAwesomeIcon icon={faListCheck}/>
                         </div>
                         <p>Assign</p>

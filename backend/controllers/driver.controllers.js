@@ -9,8 +9,8 @@ class driverController {
         try{
             const {fullName, username, email, password} = req.body;
 
-            const user = await driverModel.findOne({email});
-            if(user) {
+            const driver = await driverModel.findOne({email});
+            if(driver) {
                 return res.status(409).json("You already have an account. Please log in");
             }
 
@@ -22,19 +22,19 @@ class driverController {
             const salt = await bcrypt.genSalt(10);
             const hash = await bcrypt.hash(password, salt);
     
-            const createdUser = await driverModel.create({
+            const createdDriver = await driverModel.create({
                 fullName,
                 username,
                 email,
                 password : hash
             });
 
-            const sentUser = await driverModel.findById(createdUser._id).select("-password");
+            const sentDriver = await driverModel.findById(createdDriver._id).select("-password");
 
-            const token = genToken(sentUser);
+            const token = genToken(sentDriver);
             res.cookie("token", token, {httpOnly : true});
             console.log("registered");
-            return res.status(201).json({message: "driver registration successful", user: sentUser});
+            return res.status(201).json({message: "driver registration successful", addedDriver: sentDriver});
 
         } catch(err) {
             console.error(err);

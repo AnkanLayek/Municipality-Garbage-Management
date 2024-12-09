@@ -119,7 +119,7 @@ const Dashboard = () => {
                 <h2 className='text-3xl font-semibold mb-4'>Tracking Status</h2>
                 <div className='allStatusContainer h-full w-full p-5 rounded-lg overflow-y-auto'
                   style={{ boxShadow : 'inset -2px 2px 5px 3px rgb(0 0 0 / 0.05), inset 2px -2px 5px 3px rgb(0 0 0 / 0.05)' }}
-                >
+                >                                                                                    {/* index.css */}
                   {(statuses.length == 0)
                     ? <div className='h-full flex justify-center items-center text-gray-400'>
                       No Tracking Updates
