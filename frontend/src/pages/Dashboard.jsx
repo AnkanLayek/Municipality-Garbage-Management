@@ -112,7 +112,7 @@ const Dashboard = () => {
           <div className='fixed w-full top-0 z-10'>
             <NavBarComponent />
           </div>
-          <div className="h-[calc(100vh-4rem)] flex justify-between mt-16">
+          <div className="dashboardContainer h-[calc(100vh-4rem)] flex justify-between mt-16">
             {/* tracking status portion */}
             <div className="h-full w-[60%] px-5 py-3">
               <div className="status h-full w-full flex flex-col">
@@ -150,7 +150,7 @@ const Dashboard = () => {
                   ? <div className='h-[50vh] flex items-center text-gray-400'>
                     No Assignments
                   </div>
-                  : <div className='relative'>
+                  : <div className='min-w-[75%] relative'>
                     {assigns.map((eachAssign, idx) => (
                       <div key={idx} className={`slide center   ${idx == currIdx ? "active" : ""}`} >
                         <AssignCardComponent
