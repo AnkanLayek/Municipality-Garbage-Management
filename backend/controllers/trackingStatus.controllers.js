@@ -1,3 +1,4 @@
+const { v4:uuidv4 } = require('uuid');
 const trackingStatusModel = require("../models/trackingStatusModel");
 
 class trackingStatusController {
@@ -8,11 +9,11 @@ class trackingStatusController {
 
             // Finding no of exsisting tracking statuses for status ID
             const existingStatuses = await trackingStatusModel.find();
-            const length = existingStatuses.length;
-            const timeStamp = new Date();
+            // const length = existingStatuses.length;
+            // const timeStamp = new Date();
 
             const createdStatus = await trackingStatusModel.create({
-                trackingStatusId: `TRK-STS-${timeStamp}`,
+                trackingStatusId: `TRK-STS-${uuidv4()}`,
                 title,
                 message,
                 pathId,
