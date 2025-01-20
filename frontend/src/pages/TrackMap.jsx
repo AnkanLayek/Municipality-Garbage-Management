@@ -34,6 +34,7 @@ const TrackMap = () => {
     const [isExpandedPathList, setIsExpandedPathList] = useState(false);
     const [isExpandedCurrPathDetails, setIsExpandedCurrPathDetails] = useState(false);
     const [refreshPaths, setRefreshPaths] = useState(true);
+    const [lcnRcvCnt, setLcnRcvCnt] = useState(0);
     const navigate = useNavigate();
     const ref = useRef();
 
@@ -271,6 +272,7 @@ const TrackMap = () => {
     socket.on("receive location", (data) => {
         // console.log(data.location);
         // console.log(pathId)
+        setLcnRcvCnt(prev => (prev+1))
         if(data.pathId.pathId == pathId){
             setCarPosition({
                 lat: data.location.latitude,
@@ -281,6 +283,7 @@ const TrackMap = () => {
 
     socket.on("driver disconnected", (data) => {
         console.log(data.pathId)
+        setLcnRcvCnt(0);
         if(data.pathId == pathId){
             setCarPosition({
                 lat: undefined,
@@ -502,7 +505,11 @@ const TrackMap = () => {
 
                                 {/* <hr className="my-7 border-t-green-600"/>
 
-                                <div className="inline-block">
+                                <div>
+                                    <p>No. of times Location Received : {lcnRcvCnt}</p>
+                                </div> */}
+
+                                {/* <div className="inline-block">
                                     { addDustbin.allow
                                         ? addDustbin.lat
                                             ? <div>

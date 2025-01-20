@@ -25,6 +25,7 @@ function Home() {
     const [carPosition, setCarPosition] = useState({lat: undefined, lng: undefined})
     const [isStarted, setIsStarted] = useState(false);
     const [watchId, setWatchId] = useState();
+    const [lcnShrCnt, setLcnShrCnt] = useState(0);
     const navigate = useNavigate();
 
     // custom icon for dustbin
@@ -83,7 +84,7 @@ function Home() {
 
     const createDustbinMatchStatus = async (currLat, currLng) => {
         dustbins.map(async (eachDustbin) => {
-            if(((eachDustbin.coords.lat - currLat == 0.0001) || (eachDustbin.coords.lat - currLat == -0.0001)) && ((eachDustbin.coords.lng - currLng == 0.0001) || (eachDustbin.coords.lng - currLng == 0.0001))){
+            if(((eachDustbin.coords.lat - currLat <= 0.0001) || (eachDustbin.coords.lat - currLat <= -0.0001)) && ((eachDustbin.coords.lng - currLng <= 0.0001) || (eachDustbin.coords.lng - currLng <= 0.0001))){
                 const response = await fetch(`${backendURL}/trackingStatus/create`, {
                     method: 'POST',
                     headers: {
@@ -111,7 +112,7 @@ function Home() {
         const id = navigator.geolocation.watchPosition((position)=>{
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            console.log("hiii")
+            setLcnShrCnt(prev => (prev+1));
             socket.emit("send location", {location: position.coords, pathId: pathId});
             setMapCenter({lat: lat, lng: lng});
             setCarPosition({lat: lat, lng: lng});
@@ -128,6 +129,7 @@ function Home() {
         createEndJrnyStatus();
         navigator.geolocation.clearWatch(watchId);
         setCarPosition({lat: undefined, lng: undefined});
+        setLcnShrCnt(0)
         socket.emit("stop location", {pathId: pathId})
     }
 
@@ -268,6 +270,10 @@ function Home() {
                                         Start Journey
                                     </div>
                                 }
+
+                                <div>
+                                    <p>No. of times Location Shared : {lcnShrCnt}</p>
+                                </div>
                                 
                             </div>
                         </div>
