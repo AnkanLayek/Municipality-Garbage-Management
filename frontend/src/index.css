@@ -91,8 +91,11 @@
 }
 
 @media (max-width: 500px){
-    .inputsContainer{
+    .inputsContainer{               /* for AddPath.jsx also */
         width: 80vw;
+    }
+    .inputFields{
+        width: 100%;
     }
 }
 

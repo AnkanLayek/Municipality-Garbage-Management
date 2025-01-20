@@ -126,7 +126,11 @@ const Dashboard = () => {
                     </div>
                     : <div className='flex flex-col gap-3'>
                       {statuses.map((eachStatus) => (
-                        <div className='w-full p-2 bg-blue-200 text-blue-900 border-[1px] border-blue-400 rounded-md' key={eachStatus.trackingStatusId} >
+                        <div className='w-full p-2 bg-blue-200 text-blue-900 border-[1px] border-blue-400 rounded-md relative' key={eachStatus.trackingStatusId} >
+                          <div className='absolute right-3'>
+                            <p className='inline-block mr-3'>{new Date(eachStatus.createdAt).toLocaleTimeString()}</p>
+                            <p className='inline-block'>{new Date(eachStatus.createdAt).toLocaleDateString()}</p>
+                          </div>
                           <h3 className='font-semibold text-lg truncate'>
                             {eachStatus.title}
                           </h3>

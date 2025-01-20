@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPencil, faTrash, faAngleDown, faXmark, faPlus } from "@fortawesome/free-solid-svg-icons"
+import { faPencil, faTrash, faAngleDown, faXmark, faPlus, faAngleUp } from "@fortawesome/free-solid-svg-icons"
 import tempIcon from "../assets/tempDustbinMarker.png";
 import dustbinIcon from "../assets/dustbinMarker.png"
 import NavBarComponent from "../components/NavBarComponent";
@@ -29,12 +29,15 @@ const AddDustbin = () => {
     });
     const [formPathId, setFromPathId] = useState('');
     const [formPathName, setFormPathName] = useState('')
-    const [addNewPath, setAddNewPath] = useState(false)
+    const [addNewPath, setAddNewPath] = useState(false);
+    const [currPath, setCurrPath] = useState();
     const [refreshPaths, setRefreshPaths] = useState(true);
     let [isBellowAspect, setIsBellowAspect] = useState();
     const [isBlured, setIsBlured] = useState(false)
-    const [isExpanded, setIsExpanded] = useState(false);
-    const navigate = useNavigate()
+    const [isExpandedPathList, setIsExpandedPathList] = useState(false);
+    const [isExpandedCurrPathDetails, setIsExpandedCurrPathDetails] = useState(false);
+    const navigate = useNavigate();
+    const ref = useRef();
 
     const getQueryParameter = (name) => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -43,18 +46,26 @@ const AddDustbin = () => {
     }
 
     const handleNavigation = (pathId) => {
-        setIsExpanded(false)
+        setIsExpandedPathList(false)
         navigate(`/addDustbin?pathId=${pathId}`)
     }
 
     const expandPathlist = () => {
-        setIsExpanded(true)
+        setIsExpandedPathList(true)
         setIsBlured(true)
     }
 
     const shrinkPathlist = () => {
-        setIsExpanded(false)
+        setIsExpandedPathList(false)
         setIsBlured(false)
+    }
+
+    const expandCurrPathDetails = () => {
+        setIsExpandedCurrPathDetails(true)
+    }
+
+    const shrinkCurrPathDetails = () => {
+        setIsExpandedCurrPathDetails(false)
     }
 
     // custom icon for temporaty checkpoint
@@ -154,8 +165,8 @@ const AddDustbin = () => {
         }
     }
 
-    // fetch all checkpoints of the path
-    const getAllCheckpoints = async (pathId) => {
+    // fetch all checkpoints and path details of the path
+    const getCurrPathDetails = async (pathId) => {
         const response = await fetch(
             `${backendURL}/path/getAllPaths/${pathId}`,
             {
@@ -164,6 +175,7 @@ const AddDustbin = () => {
         );
         const data = await response.json();
         if(response.ok){
+            setCurrPath(data.path)
             setCheckPoints(data.path.checkPoints);
         }
     }
@@ -202,7 +214,7 @@ const AddDustbin = () => {
         else{
             setAddNewPath(false)
             setIsBlured(false)
-            getAllCheckpoints(pathId);
+            getCurrPathDetails(pathId);
             getAllDustbins(pathId);
         }
     }, [useLocation().search]);
@@ -226,9 +238,9 @@ const AddDustbin = () => {
             <div className="flex justify-between mt-16 relative">
                 { (isBellowAspect != undefined) ?
                     <>
-                        {(isBellowAspect || isExpanded)
+                        {(isBellowAspect || isExpandedPathList)
                             // side bar of path list container
-                            ? <div className={`sidePathListContainer w-96 h-full bg-white ${!isBellowAspect ? 'absolute' : ''} z-[5] overflow-y-auto`}>    {/* index.css */}
+                            ? <div className={`sidePathListContainer h-full bg-white ${isBellowAspect ? 'w-96' : 'absolute w-80'} z-[5] overflow-y-auto`}>    {/* index.css */}
                                 {!isBellowAspect
                                     ? <div className="m-4 flex flex-row-reverse">
                                         <div className="w-9 h-9 p-2 text-xl border-2 border-black rounded-full flex justify-center items-center cursor-pointer"
@@ -271,7 +283,7 @@ const AddDustbin = () => {
                         }
 
                         {/* main page portion */}
-                        <div className={`w-full flex ${ isBellowAspect ? 'flex-row' : 'flex-col' } relative`}>
+                        <div className={`w-full flex ${ isBellowAspect ? 'flex-row' : 'flex-col h-[calc(100vh-4rem)]' } relative`}>
                             {/* form for creating new path */}
                             {/* <div
                                 className={`absolute z-[3] rounded-lg flex flex-col items-center p-5 left-1/2 -translate-x-1/2 transition-all duration-150
@@ -303,7 +315,7 @@ const AddDustbin = () => {
                             </div> */}
 
                             {/* map portion */}
-                            <div className={`map z-0 ${ isBellowAspect ? ('w-[58%] h-[calc(100vh-4rem)]') : ('h-[58vh] w-full')}`}>
+                            <div className={`map z-0 ${ isBellowAspect ? ('w-[100%] h-[calc(100vh-4rem)]') : ('h-[calc(58vh-2rem)] w-full')}`}>
                                 <MapComponent>
                                     {/* Marker for all dustbins */}
                                     {dustbins.map((eachDustbin, idx) => (
@@ -343,7 +355,54 @@ const AddDustbin = () => {
                             </div>
                             
                             {/* control portion */}
-                            <div className={`controls p-10 z-[1] ${ isBellowAspect ? 'w-[42%] h-[calc(100vh-4rem)]' : 'h-[43vh] w-full'}`} style={{ boxShadow: "-10px 0px 20px -5px rgba(0, 0, 0, 0.3)" }}>
+                            <div
+                                className={`controls p-10 z-[1] absolute bg-white rounded-xl
+                                            ${ isBellowAspect ? 'w-[42%] min-h-[9rem] right-3 bottom-3' : 'min-h-[calc(42vh-2rem)] w-full right-0 bottom-0 rounded-b-none'}`}
+                                style={{ boxShadow: "-10px 0px 20px -5px rgba(0, 0, 0, 0.3) , 10px 0px 20px 5px rgba(0, 0, 0, 0.3)" }}
+                            >
+                                <div className="relative">
+                                    <div
+                                        className={`absolute top-0 right-0 text-3xl text-green-700 transition-all duration-300 ease-out cursor-pointer
+                                                    ${isExpandedCurrPathDetails ? 'rotate-180' : ''}`}
+                                        onClick={isExpandedCurrPathDetails ? shrinkCurrPathDetails : expandCurrPathDetails }
+                                    >
+                                        <FontAwesomeIcon icon={faAngleUp}/>
+                                    </div>
+
+                                    <div className="w-[calc(100%-30px)] text-2xl mb-2 text-green-700 truncate">
+                                        <p className="inline font-bold">Path ID : </p>
+                                        <p className="inline">{pathId}</p>
+                                    </div>
+                                    
+                                    <div
+                                        ref={ref}
+                                        className={`overflow-hidden transition-[all] duration-300 ease-out`}
+                                        style={{
+                                            maxHeight: isExpandedCurrPathDetails ? `${ref.current?.scrollHeight}px` : '0',
+                                            opacity: isExpandedCurrPathDetails ? '100%' : '0%'
+                                        }}
+                                    >
+                                        {currPath && (
+                                            <div className="text-lg">
+                                                <div className="truncate mb-1">
+                                                    <p className="inline font-bold">Path Name : </p>
+                                                    <p className="inline">{currPath.pathName}</p>
+                                                </div>
+                                                {/* <div className="truncate mb-1">
+                                                    <p className="inline font-bold">No Of Checkpoints : </p>
+                                                    <p className="inline">{currPath.checkPoints.length}</p>
+                                                </div> */}
+                                                <div className="truncate mb-1">
+                                                    <p className="inline font-bold">No Of Dustbins : </p>
+                                                    <p className="inline">{currPath.noOfDustbins}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <hr className="my-7 border-t-green-600"/>
+
                                 <div className="inline-block">
                                     { addDustbin.allow
                                         ? addDustbin.lat
@@ -384,7 +443,7 @@ const AddDustbin = () => {
             <div
                 className={`bluredLayer w-screen h-screen bg-black opacity-50 backdrop-blur-2xl absolute top-0 left-0 
                             ${(isBlured) ? 'block' : 'hidden'}
-                            ${(!isBellowAspect && isExpanded) ? 'z-[4]' : 'z-[2]'}`}
+                            ${(!isBellowAspect && isExpandedPathList) ? 'z-[4]' : 'z-[2]'}`}
                 >
             </div>
 

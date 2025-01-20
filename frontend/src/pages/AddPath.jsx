@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MapComponent from "../components/MapComponent";
 import { Marker, Popup, useMap, useMapEvent } from "react-leaflet";
 import L from 'leaflet'
 import 'leaflet-routing-machine'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPencil, faTrash, faAngleDown, faXmark, faPlus } from "@fortawesome/free-solid-svg-icons"
+import { faPencil, faTrash, faAngleDown, faXmark, faPlus, faAngleUp } from "@fortawesome/free-solid-svg-icons"
 import carIcon from "../assets/carMarker.png"
 import checkpointIcon from "../assets/checkPoint1.png"
 import tempIcon from "../assets/tempDustbinMarker.png"
@@ -20,14 +20,17 @@ const AddPath = () => {
     const [formPathId, setFromPathId] = useState('');
     const [formPathName, setFormPathName] = useState('')
     const [addNewPath, setAddNewPath] = useState(false)
+    const [currPath, setCurrPath] = useState();
     const [pathId, setPathId] = useState();
     const [refreshPaths, setRefreshPaths] = useState(true);
     const [checkPoints, setCheckPoints] = useState([]);
     let [addCheckPoint, setAddCheckPoint] = useState({allow: false});
     let [isBellowAspect, setIsBellowAspect] = useState();
-    const [isBlured, setIsBlured] = useState(false)
-    const [isExpanded, setIsExpanded] = useState(false);
-    const navigate = useNavigate()
+    const [isBlured, setIsBlured] = useState(false);
+    const [isExpandedPathList, setIsExpandedPathList] = useState(false);
+    const [isExpandedCurrPathDetails, setIsExpandedCurrPathDetails] = useState(false);
+    const navigate = useNavigate();
+    const ref = useRef()
     
     const getQueryParameter = (name) => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -36,7 +39,7 @@ const AddPath = () => {
     }
 
     const handleCreatePathClick = () => {
-        setIsExpanded(false)
+        setIsExpandedPathList(false)
         navigate("/addPath")
     }
 
@@ -61,18 +64,26 @@ const AddPath = () => {
     }
 
     const handleNavigation = (pathId) => {
-        setIsExpanded(false)
+        setIsExpandedPathList(false)
         navigate(`/addPath?pathId=${pathId}`)
     }
 
     const expandPathlist = () => {
-        setIsExpanded(true)
+        setIsExpandedPathList(true)
         setIsBlured(true)
     }
 
     const shrinkPathlist = () => {
-        setIsExpanded(false)
+        setIsExpandedPathList(false)
         setIsBlured(false)
+    }
+
+    const expandCurrPathDetails = () => {
+        setIsExpandedCurrPathDetails(true)
+    }
+
+    const shrinkCurrPathDetails = () => {
+        setIsExpandedCurrPathDetails(false)
     }
 
     // custom icon for checkpoint
@@ -92,7 +103,7 @@ const AddPath = () => {
     })
 
     // fetch all checkpoints of the path
-    const getAllCheckpoints = async (pathId) => {
+    const getCurrPathDetails = async (pathId) => {
         const response = await fetch(
             `${backendURL}/path/getAllPaths/${pathId}`,
             {
@@ -101,6 +112,7 @@ const AddPath = () => {
         );
         const data = await response.json();
         if(response.ok){
+            setCurrPath(data.path)
             setCheckPoints(data.path.checkPoints);
         }
     }
@@ -219,7 +231,7 @@ const AddPath = () => {
         else{
             setAddNewPath(false)
             setIsBlured(false)
-            getAllCheckpoints(pathId);
+            getCurrPathDetails(pathId);
         }
     }, [useLocation().search]);
 
@@ -243,9 +255,9 @@ const AddPath = () => {
             <div className="flex justify-between mt-16 relative">
                 { (isBellowAspect != undefined) ?
                     <>
-                        {(isBellowAspect || isExpanded)
+                        {(isBellowAspect || isExpandedPathList)
                             // side bar of path list container
-                            ? <div className={`sidePathListContainer w-96 h-full bg-white ${!isBellowAspect ? 'absolute' : ''} z-[5] overflow-y-auto`}>    {/* index.css */}
+                            ? <div className={`sidePathListContainer h-full bg-white ${isBellowAspect ? 'w-96' : 'absolute w-80'} z-[5] overflow-y-auto`}>    {/* index.css */}
                                 {!isBellowAspect
                                     ? <div className="m-4 flex flex-row-reverse">
                                         <div className="w-9 h-9 p-2 text-xl border-2 border-black rounded-full flex justify-center items-center cursor-pointer"
@@ -290,7 +302,7 @@ const AddPath = () => {
                         }
 
                         {/* main page portion */}
-                        <div className={`w-full flex ${ isBellowAspect ? 'flex-row' : 'flex-col' } relative`}>
+                        <div className={`w-full flex ${ isBellowAspect ? 'flex-row' : 'flex-col h-[calc(100vh-4rem)]' } relative`}>
                             {/* form for creating new path */}
                             <div
                                 className={`absolute z-[3] rounded-lg flex flex-col items-center p-5 left-1/2 -translate-x-1/2 transition-all duration-150
@@ -300,17 +312,17 @@ const AddPath = () => {
                                 <h1 className="text-3xl mb-10">Create New Path</h1>
                                 <form className="flex flex-col items-center"
                                     onSubmit={createPath}>
-                                    <div className="inputsContainer flex flex-col gap-3">
+                                    <div className="inputsContainer flex flex-col gap-3">    {/* index.css */}
                                         <div className="flex flex-col">
                                             <label htmlFor="pathId">Path ID</label>
                                             <input type="text" id='pathId' name="pathId"
-                                                className="px-3 py-2 w-80 border-2 border-black rounded-md"
-                                                onChange={(e) => setFromPathId(e.target.value)} />
+                                                className="inputFields px-3 py-2 w-80 border-2 border-black rounded-md"
+                                                onChange={(e) => setFromPathId(e.target.value)} />    {/* index.css */}
                                         </div>
                                         <div className="flex flex-col">
                                             <label htmlFor="pathName">Path Name</label>
                                             <input type="text" id='pathName' name="pathName"
-                                                className="px-3 py-2 w-80 border-2 border-black rounded-md"
+                                                className="inputFields px-3 py-2 w-80 border-2 border-black rounded-md"
                                                 onChange={(e) => setFormPathName(e.target.value)} />
                                         </div>
                                     </div>
@@ -325,7 +337,7 @@ const AddPath = () => {
                             </div>
 
                             {/* map portion */}
-                            <div className={`map z-0 ${ isBellowAspect ? ('w-[58%] h-[calc(100vh-4rem)]') : ('h-[58vh] w-full')}`}>
+                            <div className={`map z-0 ${ isBellowAspect ? ('w-[100%] h-[calc(100vh-4rem)]') : ('h-[calc(58vh-2rem)] w-full')}`}>
                                 <MapComponent>
                                     {/* Marker for all dustbins */}
                                     {checkPoints.map((eachCheckPoint, idx) => (
@@ -365,12 +377,64 @@ const AddPath = () => {
                             </div>
                             
                             {/* control portion */}
-                            <div className={`controls p-10 z-[1] ${ isBellowAspect ? 'w-[42%] h-[calc(100vh-4rem)]' : 'h-[43vh] w-full'}`} style={{ boxShadow: "-10px 0px 20px -5px rgba(0, 0, 0, 0.3)" }}>
-                                <div className="inline-block">
+                            <div
+                                className={`controls p-10 z-[1] absolute bg-white rounded-xl
+                                            ${ isBellowAspect ? 'w-[42%] min-h-[9rem] right-3 bottom-3' : 'min-h-[calc(42vh-2rem)] w-full right-0 bottom-0 rounded-b-none'}`}
+                                style={{ boxShadow: "-10px 0px 20px -5px rgba(0, 0, 0, 0.3) , 10px 0px 20px 5px rgba(0, 0, 0, 0.3)" }}
+                            >
+                                <div className="relative">
+                                    <div
+                                        className={`absolute top-0 right-0 text-3xl text-green-700 transition-all duration-300 ease-out cursor-pointer
+                                                    ${isExpandedCurrPathDetails ? 'rotate-180' : ''}`}
+                                        onClick={isExpandedCurrPathDetails ? shrinkCurrPathDetails : expandCurrPathDetails }
+                                    >
+                                        <FontAwesomeIcon icon={faAngleUp}/>
+                                    </div>
+
+                                    <div className="w-[calc(100%-30px)] text-2xl mb-2 text-green-700 truncate">
+                                        <p className="inline font-bold">Path ID : </p>
+                                        <p className="inline">{pathId}</p>
+                                    </div>
+                                    
+                                    <div
+                                        ref={ref}
+                                        className={`overflow-hidden transition-[all] duration-300 ease-out`}
+                                        style={{
+                                            maxHeight: isExpandedCurrPathDetails ? `${ref.current?.scrollHeight}px` : '0',
+                                            opacity: isExpandedCurrPathDetails ? '100%' : '0%'
+                                        }}
+                                    >
+                                        {currPath && (
+                                            <div className="text-lg">
+                                                <div className="truncate mb-1">
+                                                    <p className="inline font-bold">Path Name : </p>
+                                                    <p className="inline">{currPath.pathName}</p>
+                                                </div>
+                                                <div className="truncate mb-1">
+                                                    <p className="inline font-bold">No Of Checkpoints : </p>
+                                                    <p className="inline">{currPath.checkPoints.length}</p>
+                                                </div>
+                                                <div className="truncate mb-1">
+                                                    <p className="inline font-bold">No Of Dustbins : </p>
+                                                    <p className="inline">{currPath.noOfDustbins}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <hr className="my-7 border-t-green-600"/>
+
+                                <div className="inline-block w-fit">
                                     { addCheckPoint.allow
                                         ? addCheckPoint.lat
                                             ? <div>
-                                                <div>Add checkpoint at {addCheckPoint.lat}, {addCheckPoint.lng} ?</div>
+                                                <div>Add checkpoint at
+                                                    <div className="ml-8 flex flex-col">
+                                                        <p>{addCheckPoint.lat}</p>
+                                                        <p>{addCheckPoint.lng}</p>
+                                                    </div>
+                                                </div>
                                                 <form  className="my-10">
                                                     {/* <input
                                                         className="border-black border-2 rounded-md mr-1 mb-1 px-2"
@@ -410,7 +474,7 @@ const AddPath = () => {
             <div
                 className={`bluredLayer w-screen h-screen bg-black opacity-50 backdrop-blur-2xl absolute top-0 left-0 
                             ${(isBlured) ? 'block' : 'hidden'}
-                            ${(!isBellowAspect && isExpanded) ? 'z-[4]' : 'z-[2]'}`}
+                            ${(!isBellowAspect && isExpandedPathList) ? 'z-[4]' : 'z-[2]'}`}
                 >
             </div>
 

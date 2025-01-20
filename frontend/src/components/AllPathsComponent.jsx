@@ -3,7 +3,7 @@ import MapComponent from "./MapComponent";
 import RoutingComponent from "./RoutingComponent";
 const backendURL = import.meta.env.VITE_BACKEND_URL
 
-const AllPathsComponent = ({ currentPathId, onPathClick, refreshPaths }) => {
+const AllPathsComponent = ({ currentPathId, onPathClick, refreshPaths, conditionalPaths=[] }) => {
     const [paths, setPaths] = useState([])
 
     const getAllPaths = async () => {
@@ -12,10 +12,28 @@ const AllPathsComponent = ({ currentPathId, onPathClick, refreshPaths }) => {
         });
         const data = await response.json();
         if(response.ok){
-            setPaths(data.paths)
-            
+            // if(conditionalPaths.length>0){
+            //     const modifiedPaths = data.paths.filter(eachPath => conditionalPaths.includes(eachPath.pathId))
+            //     console.log(conditionalPaths)
+            //     setPaths(modifiedPaths);
+            // }
+            // else{
+                setPaths(data.paths)
+            // }
         }
     }
+
+    useEffect(() => {
+        console.log(paths)
+    })
+
+    useEffect(() => {
+        if(conditionalPaths.length>0){
+            const modifiedPaths = paths.filter(eachPath => conditionalPaths.includes(eachPath.pathId))
+            console.log(conditionalPaths)
+            setPaths(modifiedPaths);
+        }
+    }, [setPaths, conditionalPaths]);
 
     useEffect(() => {
         getAllPaths();

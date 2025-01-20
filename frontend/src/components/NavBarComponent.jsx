@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faBell, faListCheck, faUser } from "@fortawesome/free-solid-svg-icons"
+import { faBell, faIdCard, faListCheck, faUser } from "@fortawesome/free-solid-svg-icons"
 import { useNavigate } from "react-router-dom"
 import { faEdit, faXmark, faBars, faClockRotateLeft, faArrowRightFromBracket, faTruckFast, faTrashArrowUp } from "@fortawesome/free-solid-svg-icons"
 import { IconLayoutDashboard, IconMap2 } from "@tabler/icons-react"
@@ -110,6 +110,12 @@ const NavBarComponent = () => {
         navigate("/addDustbin")
     }
 
+    const navigateDriver = () => {
+        setExpandedProfile(false)
+        setExpandedMenu(false)
+        navigate("/addDriver")
+    }
+
     const navigateVehicle = () => {
         setExpandedProfile(false)
         setExpandedMenu(false)
@@ -216,11 +222,11 @@ const NavBarComponent = () => {
                         </div>
                         <p>Manage Dustbins</p>
                     </div>
-                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer">
+                    <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer" onClick={navigateDriver}>
                         <div className="w-10">
-                            
+                        <FontAwesomeIcon icon={faIdCard}/>
                         </div>
-                        <p>Manage</p>
+                        <p>Manage Drivers</p>
                     </div>
                     <div className="navMenuOps w-60 py-2 px-4 text-lg text-start rounded-r-full flex items-center cursor-pointer" onClick={navigateVehicle}>
                         <div className="w-10">
