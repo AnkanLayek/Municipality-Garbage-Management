@@ -9,9 +9,10 @@ class trackingStatusController {
             // Finding no of exsisting tracking statuses for status ID
             const existingStatuses = await trackingStatusModel.find();
             const length = existingStatuses.length;
+            const timeStamp = new Date();
 
             const createdStatus = await trackingStatusModel.create({
-                trackingStatusId: `TRK-STS-${length+1}`,
+                trackingStatusId: `TRK-STS-${timeStamp}`,
                 title,
                 message,
                 pathId,
