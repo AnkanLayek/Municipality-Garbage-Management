@@ -43,10 +43,14 @@ io.on("connection", (socket) => {
         socket.join("AdminTrackingRoom")
     }
     socket.on('send location', (data) => {
-        socket.to("AdminTrackingRoom").emit("receive location", {id: socket.id, pathId: data.pathId.pathId, ...data});
+        if(data.pathId){
+            socket.to("AdminTrackingRoom").emit("receive location", {id: socket.id, pathId: data.pathId.pathId, ...data});
+        }
     })
     socket.on('stop location', (data) => {
-        socket.to("AdminTrackingRoom").emit("driver disconnected", {id: socket.id, pathId: data.pathId.pathId})
+        if(data.pathId){
+            socket.to("AdminTrackingRoom").emit("driver disconnected", {id: socket.id, pathId: data.pathId.pathId});
+        }
     })
     socket.on('status created', () => {
         socket.to("AdminTrackingRoom").emit("update statuses")
